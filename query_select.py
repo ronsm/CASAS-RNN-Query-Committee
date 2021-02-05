@@ -10,7 +10,6 @@ from modAL.disagreement import vote_entropy, consensus_entropy, entropy, max_dis
 from log import Log
 
 ROLLING_WINDOW = 30
-NUM_CLASSES = 11
 NUM_LEARNERS = 3
 
 class QuerySelect(object):
@@ -20,8 +19,11 @@ class QuerySelect(object):
         self.logger = Log(self.id)
 
         self.create_buffers()
+        self.count_classes()
 
         self.logger.log_great('Ready.')
+
+    # Dataset
 
     # Buffer
     def create_buffers(self):
