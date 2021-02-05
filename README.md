@@ -55,7 +55,7 @@ File ```committee_predict.py``` simply loads the provided models and makes predi
 
 File ```query_select.py``` has two main tasks:
 * Maintain a sample buffer
-* Abstract from the buffer a rolling fixed size window from the head of the buffer (length determiend by ```ROLLING_WINDOW```)
+* Abstracts from the buffer a rolling window from the head of the buffer (length determiend by ```ROLLING_WINDOW```)
 * Evaluate the max disagreement (Kullback-Leibler divergence) between the learners over the fixed window
 
 Max disagreement is found by calculating the consensus probabilities, measuring entropy of the consensus, and then by calculating the Kullback-Leibler divergence of each learner to the consensus prediction. Max disagreement is then the argmax of the learner KL divergence for each sample.
