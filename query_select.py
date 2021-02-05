@@ -19,11 +19,8 @@ class QuerySelect(object):
         self.logger = Log(self.id)
 
         self.create_buffers()
-        self.count_classes()
 
         self.logger.log_great('Ready.')
-
-    # Dataset
 
     # Buffer
     def create_buffers(self):
