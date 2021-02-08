@@ -15,6 +15,7 @@ from tensorflow import keras
 import sys
 from time import perf_counter
 from time import sleep
+import pickle
 
 from log import Log
 
@@ -27,7 +28,7 @@ class CommitteePredict(object):
 
         self.counter = 0
         self.load_test_data_and_models()
-        # self.load_label_encoder()
+        self.load_labels()
 
         self.logger.log_great('Ready.')
 
@@ -54,9 +55,12 @@ class CommitteePredict(object):
         self.model_biLSTM = model_biLSTM
         self.model_CascadeLSTM = model_CascadeLSTM
 
-    def load_label_encoder(self):
-        label_encoder = LabelEncoder()
-        label_encoder.classes_ = np.load('classes.npy')
+    def load_labels(self):
+        labels = np.load('labels.npy', allow_pickle=True)
+        labels = labels.tolist()
+        labels = {v: k for k, v in labels.items()} # inverse the map
+        self.labels = labels
+        print(labels)
 
     # Predicting
 
@@ -77,17 +81,22 @@ class CommitteePredict(object):
 
         print('Actual:', self.y_test[self.counter], 'Predictions: LSTM =', np.argmax(y_pred_LSTM),', biLSTM =', np.argmax(y_pred_biLSTM), ', Cascade:LSTM = ', np.argmax(y_pred_CascadeLSTM))
 
-        self.counter = self.counter + 1
-
         committee_vote_1 = y_pred_LSTM[0]
         committee_vote_2 = y_pred_biLSTM[0]
         committee_vote_3 = y_pred_CascadeLSTM[0]
         
         true = self.y_test[self.counter]
+        true = true[0]
+
+        self.counter = self.counter + 1
 
         return committee_vote_1, committee_vote_2, committee_vote_3, true
 
     # Class Methods
+
+    def get_label(self, class_number):
+        label = self.labels[class_number]
+        return label
 
     def reset_counter(self):
         self.counter = 0

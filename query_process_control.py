@@ -65,20 +65,25 @@ class QueryProcessControl(object):
             writer.writerow(["Learner 1", "Learner 2", "Learner 3", "Truth", "Max Disagreement", "Query Decision"])
 
     def csv_log(self, committee_vote_1, committee_vote_2, committee_vote_3, true, max_disagreement, query_decision):
-        committee_vote_1, committee_vote_2, committee_vote_3 = self.inverse_transform_labels(committee_vote_1, committee_vote_2, committee_vote_3)
-        log_row = [committee_vote_1, committee_vote_2, committee_vote_3, true[0], max_disagreement, query_decision]
+        committee_vote_1, committee_vote_2, committee_vote_3, true = self.inverse_transform_labels(committee_vote_1, committee_vote_2, committee_vote_3, true)
+        log_row = [committee_vote_1, committee_vote_2, committee_vote_3, true, max_disagreement, query_decision]
         with open(self.csv_filename, 'a') as fd:
             writer = csv.writer(fd)
             writer.writerow(log_row)
 
     # Utilities
 
-    def inverse_transform_labels(self, committee_vote_1, committee_vote_2, committee_vote_3):
+    def inverse_transform_labels(self, committee_vote_1, committee_vote_2, committee_vote_3, true):
         committee_vote_1 = np.argmax(committee_vote_1)
         committee_vote_2 = np.argmax(committee_vote_2)
         committee_vote_3 = np.argmax(committee_vote_3)
 
-        return committee_vote_1, committee_vote_2, committee_vote_3
+        committee_vote_1 = self.committee_predict.get_label(committee_vote_1)
+        committee_vote_2 = self.committee_predict.get_label(committee_vote_2)
+        committee_vote_3 = self.committee_predict.get_label(committee_vote_3)
+        true = self.committee_predict.get_label(true)
+
+        return committee_vote_1, committee_vote_2, committee_vote_3, true
 
 if __name__ == '__main__':
     qpc = QueryProcessControl()

@@ -12,6 +12,9 @@ from log import Log
 ROLLING_WINDOW = 30
 NUM_LEARNERS = 3
 
+THRESHOLD_MAX_DISAGREEMENT = 0.3
+THRESHOLD_PERCENT_OF_WINDOW = 0.2 # percent as floating point number
+
 class QuerySelect(object):
     def __init__(self):
         self.id = 'query_select'
@@ -20,9 +23,12 @@ class QuerySelect(object):
 
         self.create_buffers()
 
+        self.max_disagreement = np.zeros((ROLLING_WINDOW, 1))
+
         self.logger.log_great('Ready.')
 
     # Buffer
+
     def create_buffers(self):
         self.committee_member_1_buffer = []
         self.committee_member_2_buffer = []
@@ -47,7 +53,7 @@ class QuerySelect(object):
         self.committee_member_1_buffer.append(committee_vote_1)
         self.committee_member_2_buffer.append(committee_vote_2)
         self.committee_member_3_buffer.append(committee_vote_3)
-        self.true_buffer.append(true[0])
+        self.true_buffer.append(true)
         self.update_buffers()
 
     # Query Selection
@@ -91,10 +97,24 @@ class QuerySelect(object):
         self.logger.log_math('Max Disagreement:')
         print(max_disagreement)
 
+        self.max_disagreement = max_disagreement
+
         return max_disagreement
 
     def evaluate_trigger_conditions(self, max_disagreement):
-        query_decision = "yes"
+        query_decision = False
+
+        samples_over_threshold = 0
+        for i in range(ROLLING_WINDOW):
+            if self.max_disagreement[i] > THRESHOLD_MAX_DISAGREEMENT:
+                samples_over_threshold = samples_over_threshold + 1
+        
+        percent_over_threshold = samples_over_threshold / ROLLING_WINDOW
+        print("Percent over threshold:", percent_over_threshold)
+
+        if percent_over_threshold > THRESHOLD_PERCENT_OF_WINDOW:
+            query_decision = True
+
         return query_decision
 
     # Class Methods
