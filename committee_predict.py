@@ -56,7 +56,7 @@ class CommitteePredict(object):
         self.model_CascadeLSTM = model_CascadeLSTM
 
     def load_labels(self):
-        labels = np.load('labels.npy', allow_pickle=True)
+        labels = np.load('data/labels.npy', allow_pickle=True)
         labels = labels.tolist()
         labels = {v: k for k, v in labels.items()} # inverse the map
         self.labels = labels
