@@ -18,6 +18,10 @@ class Log(object):
     def log(self, msg):
         tag = '[' + self.id + ']'
         print(Fore.CYAN + tag, Fore.RESET + msg)
+
+    def log_math(self, msg):
+        tag = '[' + self.id + ']'
+        print(Fore.CYAN + tag, Fore.YELLOW + msg, Fore.RESET)
     
     def log_warn(self, msg):
         tag = '[' + self.id + ']'

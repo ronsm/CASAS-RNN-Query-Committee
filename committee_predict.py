@@ -27,6 +27,7 @@ class CommitteePredict(object):
 
         self.counter = 0
         self.load_test_data_and_models()
+        # self.load_label_encoder()
 
         self.logger.log_great('Ready.')
 
@@ -53,6 +54,10 @@ class CommitteePredict(object):
         self.model_biLSTM = model_biLSTM
         self.model_CascadeLSTM = model_CascadeLSTM
 
+    def load_label_encoder(self):
+        label_encoder = LabelEncoder()
+        label_encoder.classes_ = np.load('classes.npy')
+
     # Predicting
 
     def make_single_prediction(self, model, sample):
@@ -70,8 +75,7 @@ class CommitteePredict(object):
         y_pred_biLSTM = self.make_single_prediction(self.model_biLSTM, sample)
         y_pred_CascadeLSTM = self.make_single_prediction(self.model_CascadeLSTM, sample)
 
-        self.logger.log('Prediction analysis:')
-        print('Actual:', self.y_test[self.counter], 'Predictions: LSTM =', y_pred_LSTM,', biLSTM =', y_pred_biLSTM, ', Cascade:LSTM = ', y_pred_CascadeLSTM)
+        print('Actual:', self.y_test[self.counter], 'Predictions: LSTM =', np.argmax(y_pred_LSTM),', biLSTM =', np.argmax(y_pred_biLSTM), ', Cascade:LSTM = ', np.argmax(y_pred_CascadeLSTM))
 
         self.counter = self.counter + 1
 
