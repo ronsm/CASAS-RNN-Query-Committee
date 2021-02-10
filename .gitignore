@@ -2,4 +2,4 @@
 *.h5
 *.csv
 __pycache__/
-classes.npy
+labels.npy

@@ -12,7 +12,8 @@ from log import Log
 ROLLING_WINDOW = 30
 NUM_LEARNERS = 3
 
-THRESHOLD_MAX_DISAGREEMENT = 0.3
+THRESHOLD_MAX_DISAGREEMENT_INDIVIDUAL = 0.5
+THRESHOLD_MAX_DISAGREEMENT_WINDOW = 0.3
 THRESHOLD_PERCENT_OF_WINDOW = 0.2 # percent as floating point number
 
 class QuerySelect(object):
@@ -106,9 +107,12 @@ class QuerySelect(object):
 
         samples_over_threshold = 0
         for i in range(ROLLING_WINDOW):
-            if self.max_disagreement[i] > THRESHOLD_MAX_DISAGREEMENT:
+            if self.max_disagreement[i] > THRESHOLD_MAX_DISAGREEMENT_WINDOW:
                 samples_over_threshold = samples_over_threshold + 1
         
+        if self.max_disagreement[ROLLING_WINDOW - 1] > THRESHOLD_MAX_DISAGREEMENT_INDIVIDUAL:
+            query_decision = True
+
         percent_over_threshold = samples_over_threshold / ROLLING_WINDOW
         print("Percent over threshold:", percent_over_threshold)
 
