@@ -55,6 +55,7 @@ class QuerySelect(object):
         self.committee_member_2_buffer.append(committee_vote_2)
         self.committee_member_3_buffer.append(committee_vote_3)
         self.true_buffer.append(true)
+
         self.update_buffers()
 
     # Query Selection

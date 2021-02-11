@@ -6,6 +6,7 @@ from time import perf_counter, sleep, strftime
 import csv
 
 from CASAS_committee_predict import CASASCommitteePredict
+from ARAS_committee_predict import ARASCommitteePredict
 from query_select import QuerySelect
 from log import Log
 
@@ -17,11 +18,19 @@ class QueryProcessControl(object):
         self.logger.startup_msg()
 
         # set to True for real-time mode (1 second/sample)
-        self.real_time = True
+        self.real_time = False
 
         self.max_predictions = 0
 
-        self.committee_predict = CASASCommitteePredict()
+        self.dataset = "CASAS"
+
+        if self.dataset == "CASAS":
+            self.committee_predict = CASASCommitteePredict()
+        elif self.dataset == "ARAS":
+            self.committee_predict = ARASCommitteePredict()
+        else:
+            self.logger.log_warn('Invalid dataset configuration.')
+
         self.query_select = QuerySelect()
 
         self.create_csv()
