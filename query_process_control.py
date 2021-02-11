@@ -5,7 +5,7 @@ from colorama import Fore, Style
 from time import perf_counter, sleep, strftime
 import csv
 
-from committee_predict import CommitteePredict
+from CASAS_committee_predict import CASASCommitteePredict
 from query_select import QuerySelect
 from log import Log
 
@@ -21,7 +21,7 @@ class QueryProcessControl(object):
 
         self.max_predictions = 0
 
-        self.committee_predict = CommitteePredict()
+        self.committee_predict = CASASCommitteePredict()
         self.query_select = QuerySelect()
 
         self.create_csv()
