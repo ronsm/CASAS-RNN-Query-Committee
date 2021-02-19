@@ -97,3 +97,9 @@ File ```query_select.py``` has these main tasks:
 Max disagreement is found by calculating the consensus probabilities, measuring entropy of the consensus, and then by calculating the Kullback-Leibler divergence of each learner to the consensus prediction. Max disagreement is then the argmax of the learner KL divergence for each sample.
 
 The program will generate a CSV log file in the ```logs``` folder, timestamped with the date/time that the program was run. The log file shows the class prediction from each learner, the ground truth value, the calculated max disagreement, and whether a query would be triggered.
+
+### Dialogue Manager
+
+The dialogue manager class in ```dialogue_manager.py``` is actived when a data point is selected for querying. It takes in the labels from the selected sample, and starts a dialogue with the user via the terminal.
+
+It uses AIML and Spacy for NLU, and generates text using the responder class.
