@@ -34,7 +34,7 @@ class QueryProcessControl(object):
         else:
             self.logger.log_warn('Invalid dataset configuration.')
 
-        self.label_dict = self.committee_predict.get_labels_dict()
+        self.labels_dict = self.committee_predict.get_labels_dict()
 
         self.query_select = QuerySelect(self.debug)
         self.dialogue_manager = DialogueManager(self.labels_dict)
