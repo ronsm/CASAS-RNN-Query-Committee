@@ -8,6 +8,7 @@ import csv
 from CASAS_committee_predict import CASASCommitteePredict
 from ARAS_committee_predict import ARASCommitteePredict
 from query_select import QuerySelect
+from dialogue_manager import DialogueManager
 from log import Log
 
 class QueryProcessControl(object):
@@ -22,16 +23,21 @@ class QueryProcessControl(object):
 
         self.max_predictions = 0
 
-        self.dataset = "CASAS"
+        self.debug = False
+
+        self.dataset = "ARAS"
 
         if self.dataset == "CASAS":
-            self.committee_predict = CASASCommitteePredict()
+            self.committee_predict = CASASCommitteePredict(self.debug)
         elif self.dataset == "ARAS":
-            self.committee_predict = ARASCommitteePredict()
+            self.committee_predict = ARASCommitteePredict(self.debug)
         else:
             self.logger.log_warn('Invalid dataset configuration.')
 
-        self.query_select = QuerySelect()
+        self.label_dict = self.committee_predict.get_labels_dict()
+
+        self.query_select = QuerySelect(self.debug)
+        self.dialogue_manager = DialogueManager(self.labels_dict)
 
         self.create_csv()
 
@@ -47,6 +53,13 @@ class QueryProcessControl(object):
 
             committee_vote_1, committee_vote_2, committee_vote_3, true = self.committee_predict.next_prediction()
             max_disagreement, query_decision = self.query_select.insert_sample(committee_vote_1, committee_vote_2, committee_vote_3, true)
+            
+            committee_vote_1, committee_vote_2, committee_vote_3, true = self.inverse_transform_labels(committee_vote_1, committee_vote_2, committee_vote_3, true)
+            votes = [committee_vote_1, committee_vote_2, committee_vote_3]
+
+            if query_decision:
+                self.dialogue_manager.start_query(votes)
+
             self.csv_log(committee_vote_1, committee_vote_2, committee_vote_3, true, max_disagreement, query_decision)
 
             if i > 0 and self.real_time:
@@ -74,7 +87,7 @@ class QueryProcessControl(object):
             writer.writerow(["Learner 1", "Learner 2", "Learner 3", "Truth", "Max Disagreement", "Query Decision"])
 
     def csv_log(self, committee_vote_1, committee_vote_2, committee_vote_3, true, max_disagreement, query_decision):
-        committee_vote_1, committee_vote_2, committee_vote_3, true = self.inverse_transform_labels(committee_vote_1, committee_vote_2, committee_vote_3, true)
+        # committee_vote_1, committee_vote_2, committee_vote_3, true = self.inverse_transform_labels(committee_vote_1, committee_vote_2, committee_vote_3, true)
         log_row = [committee_vote_1, committee_vote_2, committee_vote_3, true, max_disagreement, query_decision]
         with open(self.csv_filename, 'a') as fd:
             writer = csv.writer(fd)

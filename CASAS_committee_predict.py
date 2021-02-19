@@ -19,11 +19,26 @@ import pickle
 
 from log import Log
 
+labels_dict = {
+    'other' : ['something else'],
+    'bed_to_toilet' : ['using the toilet', 'on the toilet'],
+    'sleep' : ['sleeping', 'going to sleep'],
+    'take_medicine' : ['taking medicine', 'taking pills', 'taking my pills'],
+    'relax' : ['relaxing', 'watching TV', 'watching a movie', 'reading'],
+    'cook' : ['making dinner', 'making lunch', 'making breakfast', 'cooking'],
+    'work' : ['working', 'doing work'],
+    'leave_home' : ['going out', 'heading out', 'going outside'],
+    'bathing' : ['taking a bath', 'taking a shower', 'having a bath', 'having a shower'],
+    'eat' : ['eating', 'eating lunch', 'eating dinner', 'eating breakfast', 'having lunch', 'having dinner', 'having breakfast']
+}
+
 class CASASCommitteePredict(object):
-    def __init__(self):
+    def __init__(self, debug):
         self.id = 'committee_predict'
 
         self.logger = Log(self.id)
+
+        self.debug = debug
 
         self.counter = 0
         self.load_test_data_and_models()
@@ -78,7 +93,8 @@ class CASASCommitteePredict(object):
         y_pred_biLSTM = self.make_single_prediction(self.model_biLSTM, sample)
         y_pred_CascadeLSTM = self.make_single_prediction(self.model_CascadeLSTM, sample)
 
-        print('Actual:', self.y_test[self.counter], 'Predictions: LSTM =', np.argmax(y_pred_LSTM),', biLSTM =', np.argmax(y_pred_biLSTM), ', Cascade:LSTM = ', np.argmax(y_pred_CascadeLSTM))
+        if self.debug:
+            print('Actual:', self.y_test[self.counter], 'Predictions: LSTM =', np.argmax(y_pred_LSTM),', biLSTM =', np.argmax(y_pred_biLSTM), ', Cascade:LSTM = ', np.argmax(y_pred_CascadeLSTM))
 
         committee_vote_1 = y_pred_LSTM[0]
         committee_vote_2 = y_pred_biLSTM[0]
@@ -94,8 +110,10 @@ class CASASCommitteePredict(object):
     # Class Methods
 
     def get_label(self, class_number):
-        label = self.labels[class_number]
-        return label
+        return self.labels[class_number]
+
+    def get_labels_dict(self):
+        return labels_dict
 
     def reset_counter(self):
         self.counter = 0

@@ -27,11 +27,43 @@ labels = ['Other', 'Going Out', 'Preparing Breakfast', 'Having Breakfast', 'Prep
     'Having Snack', 'Sleeping', 'Watching TV', 'Studying', 'Having Shower', 'Toileting', 'Napping', 'Using Internet', 'Reading Book', 'Laundry', 'Shaving',
     'Brushing Teeth', 'Talking on the Phone', 'Listening to Music', 'Cleaning', 'Having Conversation', 'Having Guest', 'Changing Clothes']
 
+labels_dict = {
+    'other' : ['something else'],
+    'going out' : ['going out', 'going outside', 'heading out'],
+    'preparing breakfast' : ['preparing breakfast', 'making breakfast', 'cooking breakfast'],
+    'having breakfast' : ['having breakfast', 'eating breakfast'],
+    'preparing lunch' : ['preparing lunch', 'making lunch', 'cooking lunch'],
+    'having lunch' : ['having lunch', 'eating lunch'],
+    'preparing dinner' : ['preparing dinner', 'making dinner', 'cooking dinner'],
+    'having dinner' : ['having dinner', 'eating dinner'],
+    'washing dishes' : ['washing dishes', 'washing up'],
+    'having snack' : ['having snack', 'having a snack', 'eating a snack', 'snacking'],
+    'sleeping' : ['sleeping', 'going to sleep'],
+    'watching TV' : ['watching TV', 'watching television', 'watching a movie'],
+    'studying' : ['studying'],
+    'having shower' : ['having a shower', 'taking a shower', 'showering'],
+    'toileting' : ['using the toilet', 'on the toilet'],
+    'napping' : ['napping', 'taking a nap', 'having a nap'],
+    'using internet' : ['using the internet', 'on the internet'],
+    'reading book' : ['reading', 'reading a book', 'reading a magazine', 'reading the newspaper'],
+    'laundry' : ['doing laundry', 'laundry', 'washing clothes'],
+    'shaving' : ['shaving', 'having a shave'],
+    'brushing teeth' : ['brushing teeth', 'brushing my teeth'],
+    'talking on the phone' : ['on the phone', 'using the phone'],
+    'listening to music' : ['listening to music', 'playing music'],
+    'cleaning' : ['cleaning', 'cleaning up', 'doing housework'],
+    'having conversation' : ['talking', 'having a conversation'],
+    'having guest' : ['having a guest', 'having guest'],
+    'changing clothes' : ['changing clothes', 'getting changed', 'getting dressed']
+}
+
 class ARASCommitteePredict(object):
-    def __init__(self):
+    def __init__(self, debug):
         self.id = 'committee_predict'
 
         self.logger = Log(self.id)
+
+        self.debug = debug
 
         self.counter = 0
         self.load_test_data_and_models()
@@ -61,7 +93,8 @@ class ARASCommitteePredict(object):
             y_pred_model_2 = self.make_single_prediction(self.model_2, X)
             y_pred_model_3 = self.make_single_prediction(self.model_3, X)
 
-            print('Actual:', y, 'Predictions: Model 1 =', np.argmax(y_pred_model_1),', Model 2 =', np.argmax(y_pred_model_2), ', Model 3 = ', np.argmax(y_pred_model_3))
+            if self.debug:
+                print('Actual:', y, 'Predictions: Model 1 =', np.argmax(y_pred_model_1),', Model 2 =', np.argmax(y_pred_model_2), ', Model 3 = ', np.argmax(y_pred_model_3))
 
             committee_vote_1 = y_pred_model_1[0]
             committee_vote_2 = y_pred_model_2[0]
@@ -76,8 +109,10 @@ class ARASCommitteePredict(object):
     # Class Methods
 
     def get_label(self, class_number):
-        label = labels[class_number - 1]
-        return label
+        return labels[class_number - 1]
+    
+    def get_labels_dict(self):
+        return labels_dict
 
     def reset_counter(self):
         self.counter = 0

@@ -12,15 +12,17 @@ from log import Log
 ROLLING_WINDOW = 30
 NUM_LEARNERS = 3
 
-THRESHOLD_MAX_DISAGREEMENT_INDIVIDUAL = 0.5
-THRESHOLD_MAX_DISAGREEMENT_WINDOW = 0.3
+THRESHOLD_MAX_DISAGREEMENT_INDIVIDUAL = 0.4
+THRESHOLD_MAX_DISAGREEMENT_WINDOW = 0.2
 THRESHOLD_PERCENT_OF_WINDOW = 0.2 # percent as floating point number
 
 class QuerySelect(object):
-    def __init__(self):
+    def __init__(self, debug):
         self.id = 'query_select'
         
         self.logger = Log(self.id)
+
+        self.debug = debug
 
         self.create_buffers()
 
@@ -78,26 +80,30 @@ class QuerySelect(object):
 
         consensus_prob = np.mean([committee_member_1_pred_window, committee_member_2_pred_window, committee_member_3_pred_window], axis=0)
 
-        self.logger.log_math('Consensus Probabilities:')
-        print(consensus_prob)
+        if self.debug:
+            self.logger.log_math('Consensus Probabilities:')
+            print(consensus_prob)
 
         consensus_entropy = np.transpose(entropy(np.transpose(consensus_prob)))
 
-        self.logger.log_math('Consensus Entropy:')
-        print(consensus_entropy)
+        if self.debug:
+            self.logger.log_math('Consensus Entropy:')
+            print(consensus_entropy)
 
         learner_KL_divergence = np.zeros((ROLLING_WINDOW, NUM_LEARNERS))
         for i in range(ROLLING_WINDOW):
             for j in range(NUM_LEARNERS):
                 learner_KL_divergence[i, j] = entropy(committee_merged_pred_window[j, i], qk=consensus_prob[i])
 
-        self.logger.log_math('Kullback-Leibler Divergence:')
-        print(learner_KL_divergence)
+        if self.debug:
+            self.logger.log_math('Kullback-Leibler Divergence:')
+            print(learner_KL_divergence)
 
         max_disagreement = np.max(learner_KL_divergence, axis=1)
 
-        self.logger.log_math('Max Disagreement:')
-        print(max_disagreement)
+        if self.debug:
+            self.logger.log_math('Max Disagreement:')
+            print(max_disagreement)
 
         self.max_disagreement = max_disagreement
 
@@ -115,7 +121,8 @@ class QuerySelect(object):
             query_decision = True
 
         percent_over_threshold = samples_over_threshold / ROLLING_WINDOW
-        print("Percent over threshold:", percent_over_threshold)
+        if self.debug:
+            print("Percent over threshold:", percent_over_threshold)
 
         if percent_over_threshold > THRESHOLD_PERCENT_OF_WINDOW:
             query_decision = True
@@ -129,6 +136,3 @@ class QuerySelect(object):
         max_disagreement = self.calculate_max_disagreement()
         query_decision = self.evaluate_trigger_conditions(max_disagreement)
         return max_disagreement[ROLLING_WINDOW - 1], query_decision
-
-if __name__ == '__main__':
-    qs = QuerySelect()

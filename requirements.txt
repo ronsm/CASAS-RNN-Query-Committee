@@ -9,3 +9,4 @@ scikit-learn==0.24.1
 scipy==1.6.0
 tensorflow==2.4.1
 tensorflow-estimator==2.4.0
+python-aiml==0.9.3

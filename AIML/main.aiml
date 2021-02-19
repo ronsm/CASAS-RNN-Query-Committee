@@ -1,0 +1,54 @@
+<aiml version="1.0.1" encoding="UTF-8">
+
+    <!-- ROOT CASES -->
+
+    <category>
+        <pattern> HELLO </pattern>
+        <template>
+            <think>
+                <set name="responder">say_hello</set>
+            </think>
+        </template>
+    </category>
+
+    <category>
+        <pattern>SAVE USER LABEL *</pattern>
+        <template>
+            <think>
+                <set name="user_label"><star/></set>
+                <set name="responder">bypass</set>
+            </think>
+        </template>
+    </category>
+
+    <!-- SYNONYMOUS CASES -->
+
+    <category>
+        <pattern>I AM *</pattern>
+        <template>
+            <srai>SAVE USER LABEL <star index="1"/></srai>
+        </template>
+    </category>
+
+    <category>
+        <pattern>I'M *</pattern>
+        <template>
+            <srai>SAVE USER LABEL <star index="1"/></srai>
+        </template>
+    </category>
+
+    <category>
+        <pattern>I'M NOT * I'M *</pattern>
+        <template>
+            <srai>SAVE USER LABEL <star index="2"/></srai>
+        </template>
+    </category>
+
+    <category>
+        <pattern>I AM NOT * I AM *</pattern>
+        <template>
+            <srai>SAVE USER LABEL <star index="2"/></srai>
+        </template>
+    </category>
+
+</aiml>
