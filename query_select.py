@@ -11,6 +11,7 @@ from log import Log
 
 ROLLING_WINDOW = 30
 NUM_LEARNERS = 3
+QUERY_LOCK_LENGTH = 60
 
 THRESHOLD_MAX_DISAGREEMENT_INDIVIDUAL = 0.4
 THRESHOLD_MAX_DISAGREEMENT_WINDOW = 0.2
@@ -25,6 +26,8 @@ class QuerySelect(object):
         self.debug = debug
 
         self.create_buffers()
+
+        self.time_since_last_query = QUERY_LOCK_LENGTH
 
         self.max_disagreement = np.zeros((ROLLING_WINDOW, 1))
 
@@ -126,6 +129,15 @@ class QuerySelect(object):
 
         if percent_over_threshold > THRESHOLD_PERCENT_OF_WINDOW:
             query_decision = True
+
+        if query_decision:
+            if self.time_since_last_query >= QUERY_LOCK_LENGTH:
+                self.time_since_last_query = 0
+            else:
+                query_decision = False
+                self.time_since_last_query = self.time_since_last_query + 1
+        else:
+            self.time_since_last_query = self.time_since_last_query + 1
 
         return query_decision
 
