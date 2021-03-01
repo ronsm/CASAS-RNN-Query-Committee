@@ -4,6 +4,7 @@ from sklearn.metrics import mutual_info_score
 from colorama import Fore, Style
 from time import perf_counter, sleep, strftime
 import csv
+import threading
 
 from CASAS_committee_predict import CASASCommitteePredict
 from ARAS_committee_predict import ARASCommitteePredict
@@ -58,7 +59,10 @@ class QueryProcessControl(object):
             votes = [committee_vote_1, committee_vote_2, committee_vote_3]
 
             if query_decision:
-                self.dialogue_manager.start_query(votes)
+                if self.real_time:
+                    threading.Thread(target=lambda: self.dialogue_manager.start_query(votes)).start()
+                else:
+                    self.dialogue_manager.start_query(votes)
 
             self.csv_log(committee_vote_1, committee_vote_2, committee_vote_3, true, max_disagreement, query_decision)
 
