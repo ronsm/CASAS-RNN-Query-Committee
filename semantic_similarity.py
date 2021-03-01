@@ -24,11 +24,13 @@ class SemanticSimilarity(object):
         if len(labels) == 2:
             similarity_scores = self.compute_similarity(compare, True, labels)
             similarity_scores_sorted = self.sort_similarity_scores(similarity_scores)
+            options = self.get_options_natural_descriptions(options)
             return follow_up, options
         elif len(labels) == 3:
             similarity_scores = self.compute_similarity(compare)
             similarity_scores_sorted = self.sort_similarity_scores(similarity_scores)
             follow_up, options = self.evaluate_follow_up(similarity_scores_sorted)
+            options = self.get_options_natural_descriptions(options)
             return follow_up, options
         else:
             self.logger.log_warn('A query process has been started when no query is required. Upstream error.')
@@ -100,3 +102,14 @@ class SemanticSimilarity(object):
         print(data_sorted)
 
         return data_sorted
+
+    def get_options_natural_descriptions(self, options):
+        options_natural_descriptions = []
+        if len(options) > 1:
+            for option in options:
+                natural_description = self.labels_dict.get(option)
+                natural_description = natural_description[0]
+                options_natural_descriptions.append(natural_description)
+            return options_natural_descriptions
+        else:
+            return options
