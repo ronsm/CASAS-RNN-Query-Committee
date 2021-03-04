@@ -117,6 +117,12 @@ class ARASCommitteePredict(object):
     def get_label(self, class_number):
         return labels[class_number - 1]
     
+    def get_inverse_label(self, label):
+        for gt_label, descriptions in labels_dict.items():
+            for description in descriptions:
+                if description == label:
+                    return list(labels_dict.keys()).index(gt_label)
+
     def get_labels_dict(self):
         return labels_dict
 

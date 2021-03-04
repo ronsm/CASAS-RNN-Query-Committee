@@ -39,7 +39,7 @@ class QueryProcessControl(object):
         self.labels_dict = self.committee_predict.get_labels_dict()
 
         self.query_select = QuerySelect(self.debug)
-        self.annotator = Annotator(self.debug)
+        self.annotator = Annotator(self.debug, self.committee_predict)
         self.dialogue_manager = DialogueManager(self.labels_dict, self.annotator)
 
         self.create_csv()

@@ -10,12 +10,14 @@ from log import Log
 ROLLING_WINDOW = 30
 
 class Annotator(object):
-    def __init__(self, debug):
+    def __init__(self, debug, committee_predict):
         self.id = 'annotator'
 
         self.logger = Log(self.id)
 
         self.debug = debug
+
+        self.committee_predict = committee_predict
 
         self.buffer_initiated = False
 
@@ -61,6 +63,8 @@ class Annotator(object):
         self.buffer_lock = False
 
     def annotate_buffer(self, label):
+        label = self.committee_predict.get_inverse_label(label)
+
         buffer = self.sample_buffer.tolist()
 
         for row in buffer:
