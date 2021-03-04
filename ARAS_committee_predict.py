@@ -65,6 +65,8 @@ class ARASCommitteePredict(object):
 
         self.debug = debug
 
+        self.current_sample = None
+
         self.counter = 0
         self.load_test_data_and_models()
 
@@ -87,6 +89,7 @@ class ARASCommitteePredict(object):
     def next_prediction(self):
         if self.stream.has_more_samples():
             X, y = self.stream.next_sample()
+            self.save_sample(X)
             self.counter = self.counter + 1
 
             y_pred_model_1 = self.make_single_prediction(self.model_1, X)
@@ -106,6 +109,9 @@ class ARASCommitteePredict(object):
             self.logger.log_warn('Reached end of stream.')
             return False
 
+    def save_sample(self, sample):
+        self.current_sample = sample
+
     # Class Methods
 
     def get_label(self, class_number):
@@ -119,3 +125,6 @@ class ARASCommitteePredict(object):
 
     def get_max_predictions(self):
         return self.stream.n_remaining_samples()
+
+    def get_current_sample(self):
+        return self.current_sample[0]

@@ -44,6 +44,8 @@ class CASASCommitteePredict(object):
         self.load_test_data_and_models()
         self.load_labels()
 
+        self.current_sample = None
+
         self.logger.log_great('Ready.')
 
     # Data
@@ -84,6 +86,7 @@ class CASASCommitteePredict(object):
 
     def next_prediction(self):
         sample = self.x_test[self.counter]
+        self.save_sample(sample)
 
         # Keras LSTM expects 3D tensor even if batch size is one sample
         sample = np.expand_dims(sample, axis=0)
@@ -107,6 +110,9 @@ class CASASCommitteePredict(object):
 
         return committee_vote_1, committee_vote_2, committee_vote_3, true
 
+    def save_sample(self, sample):
+        self.current_sample = sample
+
     # Class Methods
 
     def get_label(self, class_number):
@@ -120,3 +126,6 @@ class CASASCommitteePredict(object):
 
     def get_max_predictions(self):
         return len(self.y_test)
+
+    def get_current_sample(self):
+        return self.current_sample[0]

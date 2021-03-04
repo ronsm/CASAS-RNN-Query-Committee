@@ -3,8 +3,8 @@
 import numpy as np
 import pandas as pd
 from sklearn.metrics import mutual_info_score
-from time import perf_counter
-from time import sleep
+from time import perf_counter, sleep, strftime
+import csv
 from modAL.disagreement import vote_entropy, consensus_entropy, entropy, max_disagreement_sampling
 
 from log import Log

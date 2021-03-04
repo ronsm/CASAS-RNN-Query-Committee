@@ -8,7 +8,7 @@ from responder import Responder
 from semantic_similarity import SemanticSimilarity
 
 class DialogueManager(object):
-    def __init__(self, labels_dict):
+    def __init__(self, labels_dict, annotator):
         self.id = 'dialogue_manager'
 
         self.logger = Log(self.id)
@@ -22,6 +22,7 @@ class DialogueManager(object):
         self.aiml.respond('load aiml go')
 
         self.responder = Responder()
+        self.annotator = annotator
         self.semantic_similarity = SemanticSimilarity(self.labels_dict)
     
     def start_query(self, labels):
@@ -57,6 +58,8 @@ class DialogueManager(object):
             follow_up, options = self.semantic_similarity.compare_similarity(user_label, options)
 
         self.responder.confirm_label(user_label)
+        self.annotator.annotate_buffer(user_label)
+        self.annotator.unlock_buffer()
 
     def process_labels(self, labels):
         reduced = []

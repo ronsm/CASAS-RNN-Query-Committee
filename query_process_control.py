@@ -10,6 +10,7 @@ from CASAS_committee_predict import CASASCommitteePredict
 from ARAS_committee_predict import ARASCommitteePredict
 from query_select import QuerySelect
 from dialogue_manager import DialogueManager
+from annotator import Annotator
 from log import Log
 
 class QueryProcessControl(object):
@@ -38,7 +39,8 @@ class QueryProcessControl(object):
         self.labels_dict = self.committee_predict.get_labels_dict()
 
         self.query_select = QuerySelect(self.debug)
-        self.dialogue_manager = DialogueManager(self.labels_dict)
+        self.annotator = Annotator(self.debug)
+        self.dialogue_manager = DialogueManager(self.labels_dict, self.annotator)
 
         self.create_csv()
 
@@ -53,12 +55,15 @@ class QueryProcessControl(object):
                 start_time = perf_counter()
 
             committee_vote_1, committee_vote_2, committee_vote_3, true = self.committee_predict.next_prediction()
+            current_sample = self.committee_predict.get_current_sample()
+            self.annotator.add_sample(current_sample)
             max_disagreement, query_decision = self.query_select.insert_sample(committee_vote_1, committee_vote_2, committee_vote_3, true)
             
             committee_vote_1, committee_vote_2, committee_vote_3, true = self.inverse_transform_labels(committee_vote_1, committee_vote_2, committee_vote_3, true)
             votes = [committee_vote_1, committee_vote_2, committee_vote_3]
 
             if query_decision:
+                self.annotator.lock_buffer()
                 if self.real_time:
                     threading.Thread(target=lambda: self.dialogue_manager.start_query(votes)).start()
                 else:
