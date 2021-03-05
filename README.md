@@ -13,7 +13,7 @@ This software forms part of a system to enable simulation of a real smart home w
 To install, run these commands:
 
 ```
-git clone https://github.com/care-group/HAR-Query-Committee.git
+git clone https://github.com/ronsm/HAR-Query-Committee.git
 cd /directory/where/you/cloned/to
 pip3 install -r requirements.txt
 ```
