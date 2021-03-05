@@ -28,6 +28,7 @@ class QueryProcessControl(object):
         self.debug = False
 
         self.dataset = "ARAS"
+        self.sample_counter = 0
 
         if self.dataset == "CASAS":
             self.committee_predict = CASASCommitteePredict(self.debug)
@@ -57,8 +58,7 @@ class QueryProcessControl(object):
             committee_vote_1, committee_vote_2, committee_vote_3, true = self.committee_predict.next_prediction()
             current_sample = self.committee_predict.get_current_sample()
             self.annotator.add_sample(current_sample)
-            max_disagreement, query_decision = self.query_select.insert_sample(committee_vote_1, committee_vote_2, committee_vote_3, true)
-            
+            max_disagreement, query_decision, disagreement_type = self.query_select.insert_sample(committee_vote_1, committee_vote_2, committee_vote_3, true)
             committee_vote_1, committee_vote_2, committee_vote_3, true = self.inverse_transform_labels(committee_vote_1, committee_vote_2, committee_vote_3, true)
             votes = [committee_vote_1, committee_vote_2, committee_vote_3]
 
@@ -68,8 +68,11 @@ class QueryProcessControl(object):
                     threading.Thread(target=lambda: self.dialogue_manager.start_query(votes)).start()
                 else:
                     self.dialogue_manager.start_query(votes)
+            
+            self.csv_log(committee_vote_1, committee_vote_2, committee_vote_3, true, disagreement_type, query_decision)
 
-            self.csv_log(committee_vote_1, committee_vote_2, committee_vote_3, true, max_disagreement, query_decision)
+            # if query_decision:
+            #     self.csv_log(committee_vote_1, committee_vote_2, committee_vote_3, true, disagreement_type, query_decision)
 
             if i > 0 and self.real_time:
                 end_time = perf_counter()
@@ -82,6 +85,8 @@ class QueryProcessControl(object):
                 else:
                     self.logger.log_warn('Predict/analyse cycle took longer than 1 second! System is not keeping up with real-time.')
 
+            self.sample_counter = self.sample_counter + 1
+
     # Logging
 
     def create_csv(self):
@@ -93,11 +98,11 @@ class QueryProcessControl(object):
 
         with open(self.csv_filename, 'w', newline='') as fd:
             writer = csv.writer(fd)
-            writer.writerow(["Learner 1", "Learner 2", "Learner 3", "Truth", "Max Disagreement", "Query Decision"])
+            writer.writerow(["Sample Count", "Learner 1", "Learner 2", "Learner 3", "Truth", "Max Disagreement", "Query Decision"])
 
-    def csv_log(self, committee_vote_1, committee_vote_2, committee_vote_3, true, max_disagreement, query_decision):
+    def csv_log(self, committee_vote_1, committee_vote_2, committee_vote_3, true, disagreement_type, query_decision):
         # committee_vote_1, committee_vote_2, committee_vote_3, true = self.inverse_transform_labels(committee_vote_1, committee_vote_2, committee_vote_3, true)
-        log_row = [committee_vote_1, committee_vote_2, committee_vote_3, true, max_disagreement, query_decision]
+        log_row = [self.sample_counter, committee_vote_1, committee_vote_2, committee_vote_3, true, disagreement_type, query_decision]
         with open(self.csv_filename, 'a') as fd:
             writer = csv.writer(fd)
             writer.writerow(log_row)

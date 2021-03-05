@@ -13,7 +13,7 @@ ROLLING_WINDOW = 30
 NUM_LEARNERS = 3
 QUERY_LOCK_LENGTH = 60
 
-THRESHOLD_MAX_DISAGREEMENT_INDIVIDUAL = 0.4
+THRESHOLD_MAX_DISAGREEMENT_INDIVIDUAL = 0.25
 THRESHOLD_MAX_DISAGREEMENT_WINDOW = 0.2
 THRESHOLD_PERCENT_OF_WINDOW = 0.2 # percent as floating point number
 
@@ -114,6 +114,7 @@ class QuerySelect(object):
 
     def evaluate_trigger_conditions(self, max_disagreement):
         query_decision = False
+        disagreement_type = ''
 
         samples_over_threshold = 0
         for i in range(ROLLING_WINDOW):
@@ -122,6 +123,7 @@ class QuerySelect(object):
         
         if self.max_disagreement[ROLLING_WINDOW - 1] > THRESHOLD_MAX_DISAGREEMENT_INDIVIDUAL:
             query_decision = True
+            disagreement_type = 'individual'
 
         percent_over_threshold = samples_over_threshold / ROLLING_WINDOW
         if self.debug:
@@ -129,6 +131,7 @@ class QuerySelect(object):
 
         if percent_over_threshold > THRESHOLD_PERCENT_OF_WINDOW:
             query_decision = True
+            disagreement_type = 'window'
 
         if query_decision:
             if self.time_since_last_query >= QUERY_LOCK_LENGTH:
@@ -139,12 +142,12 @@ class QuerySelect(object):
         else:
             self.time_since_last_query = self.time_since_last_query + 1
 
-        return query_decision
+        return query_decision, disagreement_type
 
     # Class Methods
 
     def insert_sample(self, committee_vote_1, committee_vote_2, committee_vote_3, true):
         self.insert_to_buffers(committee_vote_1, committee_vote_2, committee_vote_3, true)
         max_disagreement = self.calculate_max_disagreement()
-        query_decision = self.evaluate_trigger_conditions(max_disagreement)
-        return max_disagreement[ROLLING_WINDOW - 1], query_decision
+        query_decision, disagreement_type = self.evaluate_trigger_conditions(max_disagreement)
+        return max_disagreement[ROLLING_WINDOW - 1], query_decision, disagreement_type
