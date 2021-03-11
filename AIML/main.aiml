@@ -21,8 +21,38 @@
         </template>
     </category>
 
+    <category>
+        <pattern>AFFIRM LABEL</pattern>
+        <template>
+            <think>
+                <set name="affirm_label">true</set>
+            </think>
+        </template>
+    </category>
+
+    <category>
+        <pattern>DENY LABEL</pattern>
+        <template>
+            <think>
+                <set name="affirm_label">false</set>
+            </think>
+        </template>
+    </category>
+
+    <category>
+        <pattern>DENY LABEL WITH *</pattern>
+        <template>
+            <think>
+                <set name="affirm_label">false</set>
+                <set name="user_label"><star/></set>
+            </think>
+        </template>
+    </category>
+
+
     <!-- SYNONYMOUS CASES -->
 
+    <!-- A) LABELLING -->
     <category>
         <pattern>I AM *</pattern>
         <template>
@@ -50,5 +80,29 @@
             <srai>SAVE USER LABEL <star index="2"/></srai>
         </template>
     </category>
+
+    <!-- B) LABEL AFFIRMATION -->
+
+    <category>
+        <pattern>THAT IS CORRECT</pattern>
+        <template>
+            <srai>AFFIRM LABEL</srai>
+        </template>
+    </category>
+
+    <category>
+        <pattern>THAT IS NOT CORRECT</pattern>
+        <template>
+            <srai>DENY LABEL</srai>
+        </template>
+    </category>
+
+    <category>
+        <pattern>THAT IS NOT CORRECT I'M *</pattern>
+        <template>
+            <srai>DENY LABEL WITH <star index="1"/></srai>
+        </template>
+    </category>
+
 
 </aiml>

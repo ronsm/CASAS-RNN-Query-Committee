@@ -21,6 +21,18 @@ class Responder(object):
 
     # Dynamic
 
+    def query_1_label(self, confirmation_label):
+        choices = []
+
+        msg = 'Can you confirm that you are currently ' + confirmation_label + '?'
+        choices.append(msg)
+        msg = 'It looks to me like you are ' + confirmation_label + '. Can you confirm this for me?'
+        choices.append(msg)
+
+        choice = np.random.choice(choices)
+
+        print(choice)
+
     def query_2_labels(self, labels):
         choices = []
         

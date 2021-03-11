@@ -27,7 +27,7 @@ class QueryProcessControl(object):
 
         self.debug = False
 
-        self.dataset = "ARAS"
+        self.dataset = "CASAS"
         self.sample_counter = 0
 
         if self.dataset == "CASAS":
@@ -62,14 +62,14 @@ class QueryProcessControl(object):
             committee_vote_1, committee_vote_2, committee_vote_3, true = self.inverse_transform_labels(committee_vote_1, committee_vote_2, committee_vote_3, true)
             votes = [committee_vote_1, committee_vote_2, committee_vote_3]
 
+            self.csv_log(committee_vote_1, committee_vote_2, committee_vote_3, true, disagreement_type, query_decision)
+
             if query_decision:
                 self.annotator.lock_buffer()
                 if self.real_time:
                     threading.Thread(target=lambda: self.dialogue_manager.start_query(votes)).start()
                 else:
                     self.dialogue_manager.start_query(votes)
-            
-            self.csv_log(committee_vote_1, committee_vote_2, committee_vote_3, true, disagreement_type, query_decision)
 
             # if query_decision:
             #     self.csv_log(committee_vote_1, committee_vote_2, committee_vote_3, true, disagreement_type, query_decision)

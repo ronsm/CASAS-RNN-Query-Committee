@@ -134,4 +134,4 @@ class CASASCommitteePredict(object):
         return len(self.y_test)
 
     def get_current_sample(self):
-        return self.current_sample[0]
+        return self.current_sample

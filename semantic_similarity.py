@@ -17,23 +17,29 @@ class SemanticSimilarity(object):
 
         self.labels_dict = labels_dict
 
-    def compare_similarity(self, compare, labels):
+    def compare_similarity(self, compare, labels=[], compare_all=False):
         follow_up = False
         options = ['']
 
-        if len(labels) == 2:
-            similarity_scores = self.compute_similarity(compare, True, labels)
+        if compare_all:
+            similarity_scores = self.compute_similarity(compare, False)
             similarity_scores_sorted = self.sort_similarity_scores(similarity_scores)
-            options = self.get_options_natural_descriptions(options)
-            return follow_up, options
-        elif len(labels) == 3:
-            similarity_scores = self.compute_similarity(compare)
-            similarity_scores_sorted = self.sort_similarity_scores(similarity_scores)
-            follow_up, options = self.evaluate_follow_up(similarity_scores_sorted)
             options = self.get_options_natural_descriptions(options)
             return follow_up, options
         else:
-            self.logger.log_warn('A query process has been started when no query is required. Upstream error.')
+            if len(labels) == 2:
+                similarity_scores = self.compute_similarity(compare, True, labels)
+                similarity_scores_sorted = self.sort_similarity_scores(similarity_scores)
+                options = self.get_options_natural_descriptions(options)
+                return follow_up, options
+            elif len(labels) == 3:
+                similarity_scores = self.compute_similarity(compare)
+                similarity_scores_sorted = self.sort_similarity_scores(similarity_scores)
+                follow_up, options = self.evaluate_follow_up(similarity_scores_sorted)
+                options = self.get_options_natural_descriptions(options)
+                return follow_up, options
+            else:
+                self.logger.log_warn('Invalid number of labels provided. Upstream error.')
 
     def compute_similarity(self, compare, reduced=False, labels=['']):
         all_similarity_scores = {}
