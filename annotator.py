@@ -10,13 +10,13 @@ from log import Log
 ROLLING_WINDOW = 30
 
 class Annotator(object):
-    def __init__(self, debug, committee_predict):
+    def __init__(self, debug, dataset, committee_predict):
         self.id = 'annotator'
 
         self.logger = Log(self.id)
 
         self.debug = debug
-
+        self.dataset = dataset
         self.committee_predict = committee_predict
 
         self.buffer_initiated = False
@@ -67,9 +67,19 @@ class Annotator(object):
 
         buffer = self.sample_buffer.tolist()
 
-        for row in buffer:
+        if self.dataset == "ARAS":
+            for row in buffer:
+                row.append(label)
+
+            with open(self.csv_filename, 'a', newline='') as fd:
+                writer = csv.writer(fd)
+                writer.writerows(buffer)
+
+        elif self.dataset == "CASAS":
+            row = buffer[ROLLING_WINDOW - 1]
             row.append(label)
 
-        with open(self.csv_filename, 'a', newline='') as fd:
-            writer = csv.writer(fd)
-            writer.writerows(buffer)
+            with open(self.csv_filename, 'a', newline='') as fd:
+                writer = csv.writer(fd)
+                writer.writerow(row)
+            

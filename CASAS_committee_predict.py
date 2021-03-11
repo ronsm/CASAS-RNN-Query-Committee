@@ -121,7 +121,7 @@ class CASASCommitteePredict(object):
     def get_inverse_label(self, label):
         for key, value in labels_dict.items():
             for i in range(0, len(value)):
-                if value == label:
+                if value[i] == label:
                     return key
 
     def get_labels_dict(self):
