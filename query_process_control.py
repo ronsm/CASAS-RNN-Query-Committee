@@ -10,7 +10,8 @@ from CASAS_committee_predict import CASASCommitteePredict
 from ARAS_committee_predict import ARASCommitteePredict
 from query_select import QuerySelect
 from dialogue_manager import DialogueManager
-from annotator import Annotator
+from ARAS_annotator import ARASAnnotator
+from CASAS_annotator import CASASAnnotator
 from log import Log
 
 class QueryProcessControl(object):
@@ -23,6 +24,9 @@ class QueryProcessControl(object):
         # set to True for real-time mode (1 second/sample)
         self.real_time = False
 
+        # set to True for automatic labelling
+        self.oracle = True
+
         self.max_predictions = 0
 
         self.debug = False
@@ -32,15 +36,16 @@ class QueryProcessControl(object):
 
         if self.dataset == "CASAS":
             self.committee_predict = CASASCommitteePredict(self.debug)
+            self.annotator = CASASAnnotator(self.debug, self.dataset, self.committee_predict)
         elif self.dataset == "ARAS":
             self.committee_predict = ARASCommitteePredict(self.debug)
+            self.annotator = ARASAnnotator(self.debug, self.dataset, self.committee_predict)
         else:
             self.logger.log_warn('Invalid dataset configuration.')
 
         self.labels_dict = self.committee_predict.get_labels_dict()
 
         self.query_select = QuerySelect(self.debug)
-        self.annotator = Annotator(self.debug, self.dataset, self.committee_predict)
         self.dialogue_manager = DialogueManager(self.labels_dict, self.annotator)
 
         self.create_csv()
@@ -62,14 +67,17 @@ class QueryProcessControl(object):
             committee_vote_1, committee_vote_2, committee_vote_3, true = self.inverse_transform_labels(committee_vote_1, committee_vote_2, committee_vote_3, true)
             votes = [committee_vote_1, committee_vote_2, committee_vote_3]
 
-            self.csv_log(committee_vote_1, committee_vote_2, committee_vote_3, true, disagreement_type, query_decision)
+            self.csv_log(committee_vote_1, committee_vote_2, committee_vote_3, true, max_disagreement, query_decision)
 
             if query_decision:
                 self.annotator.lock_buffer()
                 if self.real_time:
                     threading.Thread(target=lambda: self.dialogue_manager.start_query(votes)).start()
                 else:
-                    self.dialogue_manager.start_query(votes)
+                    if self.oracle:
+                        self.annotator.annotate_buffer(true)
+                    else:   
+                        self.dialogue_manager.start_query(votes)
 
             # if query_decision:
             #     self.csv_log(committee_vote_1, committee_vote_2, committee_vote_3, true, disagreement_type, query_decision)
@@ -86,6 +94,7 @@ class QueryProcessControl(object):
                     self.logger.log_warn('Predict/analyse cycle took longer than 1 second! System is not keeping up with real-time.')
 
             self.sample_counter = self.sample_counter + 1
+            print('progress:', self.sample_counter, 'of', self.max_predictions)
 
     # Logging
 

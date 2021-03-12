@@ -21,15 +21,15 @@ from log import Log
 
 labels_dict = {
     'other' : ['something else'],
-    'bed_to_toilet' : ['using the toilet', 'on the toilet'],
-    'sleep' : ['sleeping', 'going to sleep'],
-    'take_medicine' : ['taking medicine', 'taking pills', 'taking my pills'],
-    'relax' : ['relaxing', 'watching TV', 'watching a movie', 'reading'],
-    'cook' : ['making dinner', 'making lunch', 'making breakfast', 'cooking'],
     'work' : ['working', 'doing work'],
+    'take_medicine' : ['taking medicine', 'taking pills', 'taking my pills'],
+    'sleep' : ['sleeping', 'going to sleep'],
+    'relax' : ['relaxing', 'watching TV', 'watching a movie', 'reading'],
     'leave_home' : ['going out', 'heading out', 'going outside'],
+    'eat' : ['eating', 'eating lunch', 'eating dinner', 'eating breakfast', 'having lunch', 'having dinner', 'having breakfast'],
+    'cook' : ['making dinner', 'making lunch', 'making breakfast', 'cooking'],
+    'bed_to_toilet' : ['using the toilet', 'on the toilet'],
     'bathing' : ['taking a bath', 'taking a shower', 'having a bath', 'having a shower'],
-    'eat' : ['eating', 'eating lunch', 'eating dinner', 'eating breakfast', 'having lunch', 'having dinner', 'having breakfast']
 }
 
 class CASASCommitteePredict(object):
@@ -119,10 +119,11 @@ class CASASCommitteePredict(object):
         return self.labels[class_number]
 
     def get_inverse_label(self, label):
+        pos = 0
         for key, value in labels_dict.items():
-            for i in range(0, len(value)):
-                if value[i] == label:
-                    return key
+                if key == label:
+                    return pos
+                pos = pos + 1
 
     def get_labels_dict(self):
         return labels_dict

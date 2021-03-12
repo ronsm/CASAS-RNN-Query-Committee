@@ -7,7 +7,7 @@ class Log(object):
     def startup_msg(self):
         print(Fore.YELLOW + '* * * * * * * * * * * * * * * * * *')
         print()
-        print(Style.BRIGHT + 'CASAS RNN Query Committee' + Style.RESET_ALL + Fore.YELLOW)
+        print(Style.BRIGHT + 'HAR Query Committee' + Style.RESET_ALL + Fore.YELLOW)
         print()
         print(' Developer: Ronnie Smith')
         print(' Email:     ronnie.smith@ed.ac.uk')

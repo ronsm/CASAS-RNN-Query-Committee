@@ -9,13 +9,13 @@ from modAL.disagreement import vote_entropy, consensus_entropy, entropy, max_dis
 
 from log import Log
 
-ROLLING_WINDOW = 30
+ROLLING_WINDOW = 2
 NUM_LEARNERS = 3
-QUERY_LOCK_LENGTH = 60
+QUERY_LOCK_LENGTH = 0
 
-THRESHOLD_MAX_DISAGREEMENT_INDIVIDUAL = 0.25
-THRESHOLD_MAX_DISAGREEMENT_WINDOW = 0.2
-THRESHOLD_PERCENT_OF_WINDOW = 0.2 # percent as floating point number
+THRESHOLD_MAX_DISAGREEMENT_INDIVIDUAL = 0.3
+THRESHOLD_MAX_DISAGREEMENT_WINDOW = 0.25
+THRESHOLD_PERCENT_OF_WINDOW = 1.0 # percent as floating point number
 
 class QuerySelect(object):
     def __init__(self, debug):
@@ -109,6 +109,8 @@ class QuerySelect(object):
             print(max_disagreement)
 
         self.max_disagreement = max_disagreement
+
+        print('Max Disagreement:', max_disagreement[ROLLING_WINDOW - 1])
 
         return max_disagreement
 
