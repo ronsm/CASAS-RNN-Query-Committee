@@ -56,9 +56,9 @@ class CASASCommitteePredict(object):
         y_test = pd.read_csv('data/CASAS/y_test.csv', header=None)
 
         self.logger.log('Loading models...')
-        model_LSTM = keras.models.load_model('models/CASAS/LSTM.h5')
-        model_biLSTM = keras.models.load_model('models/CASAS/biLSTM.h5')
-        model_CascadeLSTM = keras.models.load_model('models/CASAS/CascadeLSTM.h5')
+        model_1 = pickle.load(open('models/CASAS/Model1.p', 'rb'))
+        model_2 = pickle.load(open('models/CASAS/Model2.p', 'rb'))
+        model_3 = pickle.load(open('models/CASAS/Model3.p', 'rb'))
 
         x_test = x_test.values
         y_test = y_test.values
@@ -67,9 +67,9 @@ class CASASCommitteePredict(object):
 
         self.x_test = x_test
         self.y_test = y_test
-        self.model_LSTM = model_LSTM
-        self.model_biLSTM = model_biLSTM
-        self.model_CascadeLSTM = model_CascadeLSTM
+        self.model_1 = model_1
+        self.model_2 = model_2
+        self.model_3 = model_3
 
     def load_labels(self):
         labels = np.load('data/CASAS/labels.npy', allow_pickle=True)
@@ -81,7 +81,7 @@ class CASASCommitteePredict(object):
     # Predicting
 
     def make_single_prediction(self, model, sample):
-        y_pred = model.predict(sample)
+        y_pred = model.predict_proba(sample)
         return y_pred
 
     def next_prediction(self):
@@ -92,16 +92,16 @@ class CASASCommitteePredict(object):
         sample = np.expand_dims(sample, axis=0)
         print('Sample:', sample)
 
-        y_pred_LSTM = self.make_single_prediction(self.model_LSTM, sample)
-        y_pred_biLSTM = self.make_single_prediction(self.model_biLSTM, sample)
-        y_pred_CascadeLSTM = self.make_single_prediction(self.model_CascadeLSTM, sample)
+        y_pred_model_1 = self.make_single_prediction(self.model_1, sample)
+        y_pred_model_2 = self.make_single_prediction(self.model_2, sample)
+        y_pred_model_3 = self.make_single_prediction(self.model_3, sample)
 
         if self.debug:
-            print('Actual:', self.y_test[self.counter], 'Predictions: LSTM =', np.argmax(y_pred_LSTM),', biLSTM =', np.argmax(y_pred_biLSTM), ', Cascade:LSTM = ', np.argmax(y_pred_CascadeLSTM))
+            print('Actual:', self.y_test[self.counter], 'Predictions: Model 1 =', np.argmax(y_pred_model_1),', Model 2 =', np.argmax(y_pred_model_2), ', Model 3 = ', np.argmax(y_pred_model_1))
 
-        committee_vote_1 = y_pred_LSTM[0]
-        committee_vote_2 = y_pred_biLSTM[0]
-        committee_vote_3 = y_pred_CascadeLSTM[0]
+        committee_vote_1 = y_pred_model_1[0]
+        committee_vote_2 = y_pred_model_2[0]
+        committee_vote_3 = y_pred_model_3[0]
         
         true = self.y_test[self.counter]
         true = true[0]
