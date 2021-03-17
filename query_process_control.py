@@ -14,6 +14,8 @@ from ARAS_annotator import ARASAnnotator
 from CASAS_annotator import CASASAnnotator
 from log import Log
 
+QUERY_LIMIT = 4000
+
 class QueryProcessControl(object):
     def __init__(self):
         self.id = 'query_process_control'
@@ -33,6 +35,7 @@ class QueryProcessControl(object):
 
         self.dataset = "CASAS"
         self.sample_counter = 0
+        self.num_queries = 0
 
         if self.dataset == "CASAS":
             self.committee_predict = CASASCommitteePredict(self.debug)
@@ -70,6 +73,7 @@ class QueryProcessControl(object):
             self.csv_log(committee_vote_1, committee_vote_2, committee_vote_3, true, max_disagreement, query_decision)
 
             if query_decision:
+                self.num_queries = self.num_queries + 1
                 self.annotator.lock_buffer()
                 if self.real_time:
                     threading.Thread(target=lambda: self.dialogue_manager.start_query(votes)).start()
@@ -95,6 +99,10 @@ class QueryProcessControl(object):
 
             self.sample_counter = self.sample_counter + 1
             print('progress:', self.sample_counter, 'of', self.max_predictions)
+
+            if self.num_queries == QUERY_LIMIT:
+                self.logger.log_warn('Query limit reached. Terminating.')
+                break
 
     # Logging
 
