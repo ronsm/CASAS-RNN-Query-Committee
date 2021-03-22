@@ -4,3 +4,9 @@
 __pycache__/
 labels.npy
 *.p
+*.npy
+data/CASAS/original/cairo
+data/CASAS/original/kyoto7
+data/CASAS/original/kyoto8
+data/CASAS/original/kyoto11
+data/CASAS/original/milan

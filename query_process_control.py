@@ -12,9 +12,11 @@ from query_select import QuerySelect
 from dialogue_manager import DialogueManager
 from ARAS_annotator import ARASAnnotator
 from CASAS_annotator import CASASAnnotator
+from CASAS_AL_tools import CASASALTools
 from log import Log
 
 QUERY_LIMIT = 4000
+QUERY_RETRAIN = 25
 
 class QueryProcessControl(object):
     def __init__(self):
@@ -23,21 +25,36 @@ class QueryProcessControl(object):
         self.logger = Log(self.id)
         self.logger.startup_msg()
 
+        # * * * CONFIGURATION AREA * * * 
+
         # set to True for real-time mode (1 second/sample)
         self.real_time = False
 
         # set to True for automatic labelling
         self.oracle = True
 
+        # set to True for automated re-training
+        self.auto_al = True
+
+        # set a limit on the number of predictions (for debug)
         self.max_predictions = 0
 
+        # enable/disable debug mode (more verbose)
         self.debug = False
 
+        # select the dataset
         self.dataset = "CASAS"
+
+        # * * * * * * * * * * * * * * *
+
         self.sample_counter = 0
         self.num_queries = 0
+        self.num_queries_at_last_retrain = 0
 
         if self.dataset == "CASAS":
+            self.al_tools = CASASALTools()
+            if self.auto_al:
+                self.al_tools.init()
             self.committee_predict = CASASCommitteePredict(self.debug)
             self.annotator = CASASAnnotator(self.debug, self.dataset, self.committee_predict)
         elif self.dataset == "ARAS":
@@ -103,6 +120,12 @@ class QueryProcessControl(object):
             if self.num_queries == QUERY_LIMIT:
                 self.logger.log_warn('Query limit reached. Terminating.')
                 break
+            
+            if self.auto_al:
+                annotations_filename = self.annotator.get_annotation_filename()
+                if (self.num_queries % QUERY_RETRAIN == 0) and (self.num_queries > 0) and (self.num_queries_at_last_retrain != self.num_queries):
+                    self.al_tools.update(annotations_filename)
+                    self.num_queries_at_last_retrain = self.num_queries
 
     # Logging
 

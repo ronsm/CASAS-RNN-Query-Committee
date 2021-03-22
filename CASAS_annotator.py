@@ -67,4 +67,6 @@ class CASASAnnotator(object):
         with open(self.csv_filename, 'a', newline='') as fd:
             writer = csv.writer(fd)
             writer.writerow(row)
-        
+    
+    def get_annotation_filename(self):
+        return self.csv_filename

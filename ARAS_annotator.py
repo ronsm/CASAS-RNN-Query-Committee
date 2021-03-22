@@ -77,3 +77,6 @@ class ARASAnnotator(object):
         with open(self.csv_filename, 'a', newline='') as fd:
             writer = csv.writer(fd)
             writer.writerows(buffer)
+        
+    def get_annotation_filename(self):
+        return self.csv_filename

@@ -52,8 +52,8 @@ class CASASCommitteePredict(object):
 
     def load_test_data_and_models(self):
         self.logger.log('Loading test data...')
-        x_test = pd.read_csv('data/CASAS/x_test.csv', header=None)
-        y_test = pd.read_csv('data/CASAS/y_test.csv', header=None)
+        x_test = pd.read_csv('data/CASAS/CSVs/x_test.csv', header=None)
+        y_test = pd.read_csv('data/CASAS/CSVs/y_test.csv', header=None)
 
         self.logger.log('Loading models...')
         model_1 = pickle.load(open('models/CASAS/Model1.p', 'rb'))
