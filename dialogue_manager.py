@@ -6,14 +6,21 @@ import responder
 
 from responder import Responder
 from semantic_similarity import SemanticSimilarity
+from semantic_ADLs import SemanticADLs
+
+class LabelEncapsulator(object):
+    def __init__(self, model_label, ADL_label, semantic_description):
+        self.model_label = model_label
+        self.ADL_label = ADL_label
+        self.semantic_description = semantic_description
 
 class DialogueManager(object):
-    def __init__(self, labels_dict, annotator):
+    def __init__(self, annotator, label_linker):
         self.id = 'dialogue_manager'
 
         self.logger = Log(self.id)
 
-        self.labels_dict = labels_dict
+        self.label_linker = label_linker
 
         self.logger.log_great('Ready.')
 
@@ -23,7 +30,11 @@ class DialogueManager(object):
 
         self.responder = Responder()
         self.annotator = annotator
-        self.semantic_similarity = SemanticSimilarity(self.labels_dict)
+
+        self.semantic_ADLs = SemanticADLs()
+        self.labels_dict = self.semantic_ADLs.get_semantic_ADLs()
+
+        self.semantic_similarity = SemanticSimilarity(self.semantic_ADLs)
     
     def start_query(self, labels):
         for i in range(0, len(labels)):
@@ -54,24 +65,10 @@ class DialogueManager(object):
 
         if affirm_label == 'true':
             self.responder.confirm_label(confirmation_label)
+            confirmation_label = self.label_linker.get_model_label(confirmation_label)
+            print(confirmation_label)
             self.annotator.annotate_buffer(confirmation_label)
         elif affirm_label == 'false':
-            user_label = self.aiml.getPredicate('user_label')
-            if user_label != '':
-                follow_up, options = self.semantic_similarity.compare_similarity(user_label, compare_all=True)
-                if follow_up:
-                    self.responder.query_2_labels_follow_up(options)
-
-                    user_label = self.aiml.getPredicate('user_label')
-                    while user_label == '':
-                        self.get_input_and_respond()
-                        user_label = self.aiml.getPredicate('user_label')
-
-                    follow_up, options = self.semantic_similarity.compare_similarity(user_label, labels=options)
-
-                self.responder.confirm_label(user_label)
-                self.annotator.annotate_buffer(user_label)
-            else:
                 self.story_query_all_labels()
         else:
             self.logger.log_warn('Invalid affirmation response. AIML error.')
@@ -84,7 +81,7 @@ class DialogueManager(object):
             self.get_input_and_respond()
             user_label = self.aiml.getPredicate('user_label')
 
-        follow_up, options = self.semantic_similarity.compare_similarity(user_label, labels=reduced)
+        follow_up, options, top_label = self.semantic_similarity.compare_similarity(user_label, labels=reduced)
 
         self.aiml.setPredicate('user_label', '')
 
@@ -96,9 +93,11 @@ class DialogueManager(object):
                 self.get_input_and_respond()
                 user_label = self.aiml.getPredicate('user_label')
 
-            follow_up, options = self.semantic_similarity.compare_similarity(user_label, labels=options)
+            follow_up, options, top_label = self.semantic_similarity.compare_similarity(user_label, labels=options)
 
         self.responder.confirm_label(user_label)
+        user_label = self.label_linker.get_model_label(top_label)
+        print(user_label)
         self.annotator.annotate_buffer(user_label)
 
     def story_query_3_labels(self, reduced):
@@ -109,7 +108,7 @@ class DialogueManager(object):
             self.get_input_and_respond()
             user_label = self.aiml.getPredicate('user_label')
 
-        follow_up, options = self.semantic_similarity.compare_similarity(user_label, labels=reduced)
+        follow_up, options, top_label = self.semantic_similarity.compare_similarity(user_label, labels=reduced)
 
         self.aiml.setPredicate('user_label', '')
 
@@ -121,9 +120,11 @@ class DialogueManager(object):
                 self.get_input_and_respond()
                 user_label = self.aiml.getPredicate('user_label')
 
-            follow_up, options = self.semantic_similarity.compare_similarity(user_label, labels=options)
+            follow_up, options, top_label = self.semantic_similarity.compare_similarity(user_label, labels=options)
 
         self.responder.confirm_label(user_label)
+        user_label = self.label_linker.get_model_label(top_label)
+        print(user_label)
         self.annotator.annotate_buffer(user_label)
 
     def story_query_all_labels(self):
@@ -134,7 +135,7 @@ class DialogueManager(object):
             self.get_input_and_respond()
             user_label = self.aiml.getPredicate('user_label')
 
-        follow_up, options = self.semantic_similarity.compare_similarity(user_label, compare_all=True)
+        follow_up, options, top_label = self.semantic_similarity.compare_similarity(user_label, compare_all=True)
 
         self.aiml.setPredicate('user_label', '')
 
@@ -146,9 +147,11 @@ class DialogueManager(object):
                 self.get_input_and_respond()
                 user_label = self.aiml.getPredicate('user_label')
 
-            follow_up, options = self.semantic_similarity.compare_similarity(user_label, labels=options)
+            follow_up, options, top_label = self.semantic_similarity.compare_similarity(user_label, labels=options)
 
         self.responder.confirm_label(user_label)
+        user_label = self.label_linker.get_model_label(top_label)
+        print(user_label)
         self.annotator.annotate_buffer(user_label)
 
     # Tools
@@ -162,14 +165,25 @@ class DialogueManager(object):
                 count = count + 1
                 reduced.append(label)
 
-        semantic_descriptions = []
+        # semantic_descriptions = []
+        # for label in reduced:
+        #     # semantic_description = self.label_linker.get_ADL_labels(label)
+        #     semantic_description = self.label_linker.get_model_label_description(label)
+        #     semantic_descriptions.append(semantic_description)
+
+        # reduced = semantic_descriptions
+
+        label_encapsulators = []
         for label in reduced:
-            semantic_description = self.labels_dict.get(label)[0]
-            semantic_descriptions.append(semantic_description)
+            model_label = label
+            ADL_label = self.label_linker.get_ADL_labels(label)
+            semantic_description = self.label_linker.get_model_label_description(label)
+            
+            le = LabelEncapsulator(model_label, ADL_label, semantic_description)
 
-        reduced = semantic_descriptions
+            label_encapsulators.append(le)
 
-        return reduced, count
+        return label_encapsulators, count
 
     def get_input_and_respond(self):
         input = self.get_input()

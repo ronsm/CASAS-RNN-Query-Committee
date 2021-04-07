@@ -34,11 +34,12 @@ class Responder(object):
         print(choice)
 
     def query_2_labels(self, labels):
+        print(labels)
         choices = []
         
-        msg = 'It looks like you are either ' + labels[0]  + ' or ' + labels[1] + '. Can you confirm for me which?'
+        msg = 'It looks like you are either ' + labels[0].semantic_description  + ' or ' + labels[1].semantic_description + '. Can you confirm for me which?'
         choices.append(msg)
-        msg = 'It appears to me that you are currently ' + labels[0] + ' or ' + labels[1] + '. Can you tell me which is correct?'
+        msg = 'It appears to me that you are currently ' + labels[0].semantic_description + ' or ' + labels[1].semantic_description + '. Can you tell me which is correct?'
         choices.append(msg)
 
         choice = np.random.choice(choices)

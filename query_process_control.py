@@ -13,6 +13,7 @@ from dialogue_manager import DialogueManager
 from ARAS_annotator import ARASAnnotator
 from CASAS_annotator import CASASAnnotator
 from CASAS_AL_tools import CASASALTools
+from label_linker import LabelLinker
 from log import Log
 
 QUERY_LIMIT = 4000
@@ -31,7 +32,7 @@ class QueryProcessControl(object):
         self.real_time = False
 
         # set to True for automatic labelling
-        self.oracle = True
+        self.oracle = False
 
         # set to True for automated re-training
         self.auto_al = True
@@ -63,10 +64,9 @@ class QueryProcessControl(object):
         else:
             self.logger.log_warn('Invalid dataset configuration.')
 
-        self.labels_dict = self.committee_predict.get_labels_dict()
-
         self.query_select = QuerySelect(self.debug)
-        self.dialogue_manager = DialogueManager(self.labels_dict, self.annotator)
+        self.label_linker = LabelLinker(self.dataset)
+        self.dialogue_manager = DialogueManager(self.annotator, self.label_linker)
 
         self.create_csv()
 

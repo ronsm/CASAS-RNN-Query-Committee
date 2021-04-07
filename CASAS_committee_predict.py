@@ -19,19 +19,6 @@ import pickle
 
 from log import Log
 
-labels_dict = {
-    'other' : ['something else'],
-    'work' : ['working', 'doing work'],
-    'take_medicine' : ['taking medicine', 'taking pills', 'taking my pills'],
-    'sleep' : ['sleeping', 'going to sleep'],
-    'relax' : ['relaxing', 'watching TV', 'watching a movie', 'reading'],
-    'leave_home' : ['going out', 'heading out', 'going outside'],
-    'eat' : ['eating', 'eating lunch', 'eating dinner', 'eating breakfast', 'having lunch', 'having dinner', 'having breakfast'],
-    'cook' : ['making dinner', 'making lunch', 'making breakfast', 'cooking'],
-    'bed_to_toilet' : ['using the toilet', 'on the toilet'],
-    'bathing' : ['taking a bath', 'taking a shower', 'having a bath', 'having a shower'],
-}
-
 class CASASCommitteePredict(object):
     def __init__(self, debug):
         self.id = 'committee_predict'
@@ -117,16 +104,6 @@ class CASASCommitteePredict(object):
 
     def get_label(self, class_number):
         return self.labels[class_number]
-
-    def get_inverse_label(self, label):
-        pos = 0
-        for key, value in labels_dict.items():
-                if key == label:
-                    return pos
-                pos = pos + 1
-
-    def get_labels_dict(self):
-        return labels_dict
 
     def reset_counter(self):
         self.counter = 0

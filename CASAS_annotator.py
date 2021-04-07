@@ -59,7 +59,7 @@ class CASASAnnotator(object):
         self.logger.log(msg)
 
         label = label.lower()
-        label = self.committee_predict.get_inverse_label(label)
+        # label = self.committee_predict.get_inverse_label(label)
 
         row = self.hold_sample.tolist()
         row.append(label)
