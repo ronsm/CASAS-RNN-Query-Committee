@@ -164,15 +164,7 @@ class DialogueManager(object):
             if label not in reduced:
                 count = count + 1
                 reduced.append(label)
-
-        # semantic_descriptions = []
-        # for label in reduced:
-        #     # semantic_description = self.label_linker.get_ADL_labels(label)
-        #     semantic_description = self.label_linker.get_model_label_description(label)
-        #     semantic_descriptions.append(semantic_description)
-
-        # reduced = semantic_descriptions
-
+                
         label_encapsulators = []
         for label in reduced:
             model_label = label

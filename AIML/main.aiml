@@ -49,10 +49,9 @@
         </template>
     </category>
 
-
     <!-- SYNONYMOUS CASES -->
 
-    <!-- A) LABELLING -->
+    <!-- A) DIRECT LABELLING -->
     <category>
         <pattern>I AM *</pattern>
         <template>
@@ -104,5 +103,20 @@
         </template>
     </category>
 
+    <!-- DENY LABEL, CONFIRM ANOTHER LABEL -->
+
+    <category>
+        <pattern>I'M NOT * I'M *</pattern>
+        <template>
+            <srai>SAVE USER LABEL <star index="2"/></srai>
+        </template>
+    </category>
+
+    <category>
+        <pattern>I'M NOT DOING EITHER OF THOSE THINGS I'M *</pattern>
+        <template>
+            <srai>SAVE USER LABEL <star index="1"/></srai>
+        </template>
+    </category>
 
 </aiml>
