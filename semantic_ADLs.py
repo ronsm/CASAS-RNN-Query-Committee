@@ -11,6 +11,7 @@ data = {
     'leaving_the_house' : ['going out', 'heading out', 'going outside', 'leaving the house', 'going to the shops', 'going to the gym'],
     'bathing' : ['taking a bath', 'going for a bath', 'taking a shower', 'going for a shower', 'having a bath', 'having a shower', 'having a wash', 'washing myself'],
     'cooking' : ['cooking', 'making dinner', 'making lunch', 'making breakfast', 'cooking breakfast', 'cooking lunch', 'cooking dinner', 'making a snack', 'prearing breakfast', 'preparing lunch', 'preparing dinner'],
+    'prepare_drink' : ['preparing a drink', 'making a drink', 'getting a drink', 'getting something to drink', 'pouring a drink', 'getting a beer', 'pouring a glass of wine', 'getting some water'],
     'eating' : ['eating', 'eating lunch', 'eating dinner', 'eating breakfast', 'having lunch', 'having dinner', 'having breakfast', 'munching'],
     'snacking' : ['having a snack', 'eating a snack', 'having a snack attack'],
     'watching_TV' : ['watching TV', 'watching television', 'watching a programme', 'watching the news', 'watching a movie', 'watching a film', 'watching the telly'],
