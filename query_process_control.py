@@ -126,7 +126,7 @@ class QueryProcessControl(object):
                     self.logger.log_warn('Predict/analyse cycle took longer than 1 second! System is not keeping up with real-time.')
 
             self.sample_counter = self.sample_counter + 1
-            print('progress:', self.sample_counter, 'of', self.max_predictions)
+            print('Progress:', self.sample_counter, 'of', self.max_predictions)
 
             if self.num_queries == QUERY_LIMIT:
                 self.logger.log_warn('Query limit reached. Terminating.')
@@ -218,11 +218,11 @@ class QueryProcessControl(object):
     def plot_learner_val_accuracies(self):
         val_scores_learner_1, val_scores_learner_2, val_scores_learner_3 = self.al_tools.get_val_scores()
 
-        accuracy_query_markers = self.accuracy_query_markers.insert(0, 0)
+        self.accuracy_query_markers.insert(0, 0)
 
-        plt.plot(accuracy_query_markers, val_scores_learner_1, marker='', color='blue', linewidth=2, label='Learner 1')
-        plt.plot(accuracy_query_markers, val_scores_learner_1, marker='', color='red', linewidth=2, label='Learner 2')
-        plt.plot(accuracy_query_markers, val_scores_learner_1, marker='', color='green', linewidth=2, label='Learner 3')
+        plt.plot(self.accuracy_query_markers, val_scores_learner_1, marker='', color='blue', linewidth=2, label='Learner 1')
+        plt.plot(self.accuracy_query_markers, val_scores_learner_2, marker='', color='red', linewidth=2, label='Learner 2')
+        plt.plot(self.accuracy_query_markers, val_scores_learner_3, marker='', color='green', linewidth=2, label='Learner 3')
 
         plt.legend()
 
