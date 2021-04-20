@@ -9,11 +9,12 @@ import numpy as np
 import pandas as pd
 from keras.callbacks import ModelCheckpoint, CSVLogger
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
 from sklearn.model_selection import StratifiedKFold
 from sklearn.utils import compute_class_weight
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import train_test_split
+from sklearn.utils import shuffle
 from sklearn import tree
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn import svm
@@ -36,6 +37,10 @@ class CASASALTools(object):
 
         self.logger = Log(self.id)
 
+        self.val_scores_learner_1 = []
+        self.val_scores_learner_2 = []
+        self.val_scores_learner_3 = []
+
         self.logger.log_great('Ready.')
 
     def create_train_test_csvs(self, annotations=None):
@@ -48,18 +53,21 @@ class CASASALTools(object):
         x_test, x_validation, y_test, y_validation = train_test_split(x_test, y_test, shuffle=False, test_size=400, random_state=seed)
 
         if annotations != None:
-            self.logger.log_warn('[WARNING] Annotations file is present. Annotations will be appended to the training set.')
+            msg = '[WARNING] Annotations file provided: ' + annotations + '. Annotations will be appended to the training set.'
+            self.logger.log_warn(msg)
             annotations = pd.read_csv(annotations, skiprows=1, header=None)
             y_annotations = annotations.iloc[:,-1:]
             x_annotations = annotations.drop(annotations.columns[-1], axis=1)
 
             x_train = pd.DataFrame(x_train)
             x_train = pd.concat([x_train, x_annotations])
+            x_train = shuffle(x_train, random_state=seed)
             x_train = x_train.values
 
             y_train = pd.DataFrame(y_train)
             y_annotations = y_annotations.rename(columns={2000:0})
             y_train = pd.concat([y_train, y_annotations])
+            y_train = shuffle(y_train, random_state=seed)
             y_train = y_train.values
 
         x_test = pd.DataFrame(x_test)
@@ -74,11 +82,17 @@ class CASASALTools(object):
         x_train_write.to_csv('data/CASAS/CSVs/x_train.csv', index=False, header=False)
         y_train_write.to_csv('data/CASAS/CSVs/y_train.csv', index=False, header=False)
 
+        train_combined = pd.concat([x_train_write, y_train_write], axis=1)
+        train_combined.to_csv('data/CASAS/CSVs/train.csv', index=False, header=True)
+
         x_test.to_csv('data/CASAS/CSVs/x_test.csv', index=False, header=False)
         y_test.to_csv('data/CASAS/CSVs/y_test.csv', index=False, header=False)
         
         x_validation.to_csv('data/CASAS/CSVs/x_validation.csv', index=False, header=False)
         y_validation.to_csv('data/CASAS/CSVs/y_validation.csv', index=False, header=False)
+
+        validation_combined = pd.concat([x_validation, y_validation], axis=1)
+        validation_combined.to_csv('data/CASAS/CSVs/validation.csv', index=False, header=True)
 
         y_train = y_train.astype('int')
 
@@ -129,7 +143,7 @@ class CASASALTools(object):
         Y = label_encoder.fit_transform(Y)
         np.save('classes.npy', label_encoder.classes_)
 
-        dt = tree.DecisionTreeClassifier()
+        dt = tree.DecisionTreeClassifier(min_samples_leaf=10)
 
         scores = cross_val_score(dt, X, Y, cv=5)
         print("%0.2f accuracy with a standard deviation of %0.2f" % (scores.mean(), scores.std()))
@@ -172,14 +186,24 @@ class CASASALTools(object):
         model_1_preds = model_1.predict(x_test_data)
         cr_model_1 = classification_report(y_test_data, model_1_preds)
         print(cr_model_1)
+        acc_model_1 = accuracy_score(y_test_data, model_1_preds)
+        self.val_scores_learner_1.append(acc_model_1)
 
         model_2_preds = model_2.predict(x_test_data)
         cr_model_2 = classification_report(y_test_data, model_2_preds)
         print(cr_model_2)
+        acc_model_2 = accuracy_score(y_test_data, model_2_preds)
+        self.val_scores_learner_2.append(acc_model_2)
 
         model_3_preds = model_3.predict(x_test_data)
         cr_model_3 = classification_report(y_test_data, model_3_preds)
         print(cr_model_3)
+        acc_model_3 = accuracy_score(y_test_data, model_3_preds)
+        self.val_scores_learner_3.append(acc_model_3)
+
+        print(self.val_scores_learner_1)
+        print(self.val_scores_learner_2)
+        print(self.val_scores_learner_3)
     
     # Class Methods
 
@@ -194,3 +218,6 @@ class CASASALTools(object):
         self.train_models(x_train, y_train, dictActivities)
         x_validation, y_validation, model_1, model_2, model_3 = self.load_test_data_and_models()
         self.make_batch_predictions(x_validation, y_validation, model_1, model_2, model_3)
+
+    def get_val_scores(self):
+        return self.val_scores_learner_1, self.val_scores_learner_2, self.val_scores_learner_3

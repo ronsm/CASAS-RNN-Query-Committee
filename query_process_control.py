@@ -5,6 +5,7 @@ from colorama import Fore, Style
 from time import perf_counter, sleep, strftime
 import csv
 import threading
+import matplotlib.pyplot as plt
 
 from CASAS_committee_predict import CASASCommitteePredict
 from query_select import QuerySelect
@@ -35,10 +36,10 @@ class QueryProcessControl(object):
         # set to True for automated re-training
         self.auto_al = True
 
-        # set a limit on the number of predictions (for debug)
+        # set a limit on the number of predictions (for debug) - set to zero to disable
         self.max_predictions = 0
 
-        # enable/disable debug mode (more verbose)
+        # enable/disable debug mode (more verbose, particularly math operations) - caution: terminal lag
         self.debug = False
 
         # select the dataset
@@ -49,6 +50,17 @@ class QueryProcessControl(object):
         self.sample_counter = 0
         self.num_queries = 0
         self.num_queries_at_last_retrain = 0
+
+        self.learner_1_correct = 0
+        self.learner_2_correct = 0
+        self.learner_3_correct = 0
+
+        self.learner_1_accuracies = []
+        self.learner_2_accuracies = []
+        self.learner_3_accuracies = []
+
+        self.accuracy_query_markers = []
+        self.samples_between_queries = 0
 
         if self.dataset == "CASAS":
             self.al_tools = CASASALTools()
@@ -69,7 +81,9 @@ class QueryProcessControl(object):
 
     def run(self):
         self.committee_predict.reset_counter()
-        self.max_predictions = self.committee_predict.get_max_predictions()
+
+        if self.max_predictions == 0:
+            self.max_predictions = self.committee_predict.get_max_predictions()
 
         for i in range(0, self.max_predictions):
             if i > 0 and self.real_time:
@@ -80,11 +94,13 @@ class QueryProcessControl(object):
             self.annotator.add_sample(current_sample)
             max_disagreement, query_decision, disagreement_type = self.query_select.insert_sample(committee_vote_1, committee_vote_2, committee_vote_3, true)
             committee_vote_1, committee_vote_2, committee_vote_3, true = self.inverse_transform_labels(committee_vote_1, committee_vote_2, committee_vote_3, true)
-            votes = [committee_vote_1, committee_vote_2, committee_vote_3]
+            
+            self.check_votes(committee_vote_1, committee_vote_2, committee_vote_3, true)
 
             self.csv_log(committee_vote_1, committee_vote_2, committee_vote_3, true, max_disagreement, query_decision)
 
             if query_decision:
+                votes = [committee_vote_1, committee_vote_2, committee_vote_3]
                 self.num_queries = self.num_queries + 1
                 self.annotator.lock_buffer()
                 if self.real_time:
@@ -122,6 +138,18 @@ class QueryProcessControl(object):
                     self.al_tools.update(annotations_filename)
                     self.num_queries_at_last_retrain = self.num_queries
 
+                    self.check_and_save_learner_accuracies()
+                    self.reset_learner_correct_counts()
+            else:
+                if (self.num_queries % QUERY_RETRAIN == 0) and (self.num_queries > 0) and (self.num_queries_at_last_retrain != self.num_queries):
+                    self.num_queries_at_last_retrain = self.num_queries
+
+                    self.check_and_save_learner_accuracies()
+                    self.reset_learner_correct_counts()
+
+        # self.plot_learner_accuracies()
+        self.plot_learner_val_accuracies()
+
     # Logging
 
     def create_csv(self):
@@ -141,6 +169,64 @@ class QueryProcessControl(object):
         with open(self.csv_filename, 'a') as fd:
             writer = csv.writer(fd)
             writer.writerow(log_row)
+
+    # Graphing
+
+    def check_votes(self, committee_vote_1, committee_vote_2, committee_vote_3, true):
+        print(committee_vote_1, committee_vote_2, committee_vote_3, true)
+
+        if committee_vote_1 == true:
+            self.learner_1_correct = self.learner_1_correct + 1
+        
+        if committee_vote_2 == true:
+            self.learner_2_correct = self.learner_2_correct + 1
+        
+        if committee_vote_3 == true:
+            self.learner_3_correct = self.learner_3_correct + 1
+
+        self.samples_between_queries = self.samples_between_queries + 1
+
+    def check_and_save_learner_accuracies(self):
+        learner_1_accuracy = self.learner_1_correct / self.samples_between_queries
+        learner_2_accuracy = self.learner_2_correct / self.samples_between_queries
+        learner_3_accuracy = self.learner_3_correct / self.samples_between_queries
+
+        self.learner_1_accuracies.append(learner_1_accuracy)
+        self.learner_2_accuracies.append(learner_2_accuracy)
+        self.learner_3_accuracies.append(learner_3_accuracy)
+
+        self.accuracy_query_markers.append(self.num_queries)
+
+        print(self.learner_1_accuracies, self.learner_2_accuracies, self.learner_3_accuracies)
+
+    def reset_learner_correct_counts(self):
+        self.samples_between_queries = 0
+
+        self.learner_1_correct = 0
+        self.learner_2_correct = 0
+        self.learner_3_correct = 0
+
+    def plot_learner_accuracies(self):
+        plt.plot(self.accuracy_query_markers, self.learner_1_accuracies, marker='', color='blue', linewidth=2, label='Learner 1')
+        plt.plot(self.accuracy_query_markers, self.learner_2_accuracies, marker='', color='red', linewidth=2, label='Learner 2')
+        plt.plot(self.accuracy_query_markers, self.learner_3_accuracies, marker='', color='green', linewidth=2, label='Learner 3')
+
+        plt.legend()
+
+        plt.show()
+
+    def plot_learner_val_accuracies(self):
+        val_scores_learner_1, val_scores_learner_2, val_scores_learner_3 = self.al_tools.get_val_scores()
+
+        accuracy_query_markers = self.accuracy_query_markers.insert(0, 0)
+
+        plt.plot(accuracy_query_markers, val_scores_learner_1, marker='', color='blue', linewidth=2, label='Learner 1')
+        plt.plot(accuracy_query_markers, val_scores_learner_1, marker='', color='red', linewidth=2, label='Learner 2')
+        plt.plot(accuracy_query_markers, val_scores_learner_1, marker='', color='green', linewidth=2, label='Learner 3')
+
+        plt.legend()
+
+        plt.show()
 
     # Utilities
 
