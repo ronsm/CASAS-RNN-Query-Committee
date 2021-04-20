@@ -7,10 +7,8 @@ import csv
 import threading
 
 from CASAS_committee_predict import CASASCommitteePredict
-from ARAS_committee_predict import ARASCommitteePredict
 from query_select import QuerySelect
 from dialogue_manager import DialogueManager
-from ARAS_annotator import ARASAnnotator
 from CASAS_annotator import CASASAnnotator
 from CASAS_AL_tools import CASASALTools
 from label_linker import LabelLinker
@@ -32,7 +30,7 @@ class QueryProcessControl(object):
         self.real_time = False
 
         # set to True for automatic labelling
-        self.oracle = False
+        self.oracle = True
 
         # set to True for automated re-training
         self.auto_al = True
@@ -58,9 +56,6 @@ class QueryProcessControl(object):
                 self.al_tools.init()
             self.committee_predict = CASASCommitteePredict(self.debug)
             self.annotator = CASASAnnotator(self.debug, self.dataset, self.committee_predict)
-        elif self.dataset == "ARAS":
-            self.committee_predict = ARASCommitteePredict(self.debug)
-            self.annotator = ARASAnnotator(self.debug, self.dataset, self.committee_predict)
         else:
             self.logger.log_warn('Invalid dataset configuration.')
 
