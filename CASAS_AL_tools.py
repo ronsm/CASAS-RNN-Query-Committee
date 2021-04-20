@@ -26,6 +26,7 @@ from log import Log
 import CASAS_data
 
 seed = 7
+np.random.seed(seed)
 
 class CASASALTools(object):
     def __init__(self):

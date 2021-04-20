@@ -105,6 +105,10 @@ class CASASCommitteePredict(object):
     def get_label(self, class_number):
         return self.labels[class_number]
 
+    def get_inverse_label(self, label):
+        key = next(key for key, value in self.labels.items() if value == label)
+        return key
+
     def reset_counter(self):
         self.counter = 0
 
