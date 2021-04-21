@@ -14,6 +14,9 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.utils import compute_class_weight
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import BaggingClassifier
 from sklearn.utils import shuffle
 from sklearn import tree
 from sklearn.ensemble import GradientBoostingClassifier
@@ -26,14 +29,14 @@ import pickle
 from log import Log
 import CASAS_data
 
-seed = 7
+seed = 27
 np.random.seed(seed)
 
 class CASASALTools(object):
     def __init__(self):
         self.id = 'CASAS_AL_Tools'
 
-        self.dataset_select = "milan"
+        self.dataset_select = "kyoto11"
 
         self.logger = Log(self.id)
 
@@ -48,7 +51,7 @@ class CASASALTools(object):
 
         X, Y, dictActivities = CASAS_data.getData(self.dataset_select)
 
-        x_train, x_test, y_train, y_test = train_test_split(X, Y, shuffle=False, train_size=200, random_state=seed)
+        x_train, x_test, y_train, y_test = train_test_split(X, Y, shuffle=False, train_size=400, random_state=seed)
 
         x_test, x_validation, y_test, y_validation = train_test_split(x_test, y_test, shuffle=False, test_size=400, random_state=seed)
 
@@ -61,14 +64,15 @@ class CASASALTools(object):
 
             x_train = pd.DataFrame(x_train)
             x_train = pd.concat([x_train, x_annotations])
-            x_train = shuffle(x_train, random_state=seed)
             x_train = x_train.values
 
             y_train = pd.DataFrame(y_train)
             y_annotations = y_annotations.rename(columns={2000:0})
             y_train = pd.concat([y_train, y_annotations])
-            y_train = shuffle(y_train, random_state=seed)
             y_train = y_train.values
+
+        x_train = shuffle(x_train, random_state=seed)
+        y_train = shuffle(y_train, random_state=seed)
 
         x_test = pd.DataFrame(x_test)
         y_test = pd.DataFrame(y_test)
@@ -111,11 +115,11 @@ class CASASALTools(object):
         Y = label_encoder.fit_transform(Y)
         np.save('classes.npy', label_encoder.classes_)
 
-        rf = RandomForestClassifier(n_estimators=100)
+        rf = RandomForestClassifier(n_estimators=300, random_state=1, bootstrap=True)
 
-        scores = cross_val_score(rf, X, Y, cv=5)
-        print("%0.2f accuracy with a standard deviation of %0.2f" % (scores.mean(), scores.std()))
-        print(scores)
+        # scores = cross_val_score(rf, X, Y, cv=5)
+        # print("%0.2f accuracy with a standard deviation of %0.2f" % (scores.mean(), scores.std()))
+        # print(scores)
 
         rf = rf.fit(X, Y)
 
@@ -127,15 +131,15 @@ class CASASALTools(object):
         Y = label_encoder.fit_transform(Y)
         np.save('classes.npy', label_encoder.classes_)
 
-        gbc = GradientBoostingClassifier(n_estimators=100, learning_rate=1.0, max_depth=1, random_state=0)
+        bc = BaggingClassifier(base_estimator=tree.DecisionTreeClassifier())
 
-        scores = cross_val_score(gbc, X, Y, cv=5)
-        print("%0.2f accuracy with a standard deviation of %0.2f" % (scores.mean(), scores.std()))
-        print(scores)
+        # scores = cross_val_score(knn, X, Y, cv=5)
+        # print("%0.2f accuracy with a standard deviation of %0.2f" % (scores.mean(), scores.std()))
+        # print(scores)
 
-        gbc.fit(X, Y)
+        bc.fit(X, Y)
 
-        return gbc
+        return bc
 
     def train_model_3(self, X, Y, dictActivities):
         self.logger.log('Training model 3...')
@@ -143,11 +147,11 @@ class CASASALTools(object):
         Y = label_encoder.fit_transform(Y)
         np.save('classes.npy', label_encoder.classes_)
 
-        dt = tree.DecisionTreeClassifier(min_samples_leaf=10)
+        dt = tree.DecisionTreeClassifier()
 
-        scores = cross_val_score(dt, X, Y, cv=5)
-        print("%0.2f accuracy with a standard deviation of %0.2f" % (scores.mean(), scores.std()))
-        print(scores)
+        # scores = cross_val_score(dt, X, Y, cv=5)
+        # print("%0.2f accuracy with a standard deviation of %0.2f" % (scores.mean(), scores.std()))
+        # print(scores)
 
         dt = dt.fit(X, Y)
 

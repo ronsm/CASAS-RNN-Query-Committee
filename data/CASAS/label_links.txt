@@ -15,8 +15,8 @@ using_internet:other:doing something else
 washing_dishes:work:working
 reading:relax:relaxing
 doing_laundry:work:working
-shaving:bathing:bathing
-brushing_teeth:bathing:bathing
+shaving:personal_hygiene:bathing
+brushing_teeth:personal_hygiene:bathing
 talking_on_phone:relax:relaxing
 listening_to_music:relax:relaxing
 cleaning:work:working
@@ -26,5 +26,5 @@ getting_dressed:other:doing something else
 tidying_up:work:working
 exercising:other:doing something else
 hobby:other:doing something else
-taking_medication:take_medicine:taking your medication
+taking_medication:other:taking your medication
 toileting:bed_to_toilet:using the toilet
