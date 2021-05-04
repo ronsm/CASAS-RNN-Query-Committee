@@ -3,7 +3,7 @@
 from log import Log
 
 data = {
-    'other' : ['doing something else'],
+    'other' : ['doing something else', 'other'],
     'relaxing' : ['relaxing', 'taking a break', 'having a break', 'sitting down', 'having a rest', 'trying to relax', 'chilling out'],
     'working' : ['working', 'doing work', 'doing some work', 'getting work done'],
     'studying' : ['studying', 'studying for an exam', 'studying for a test', 'doing homework', 'going over my notes'],

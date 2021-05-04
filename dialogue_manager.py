@@ -72,7 +72,7 @@ class DialogueManager(object):
             self.responder.confirm_label(confirmation_label)
             confirmation_label = self.label_linker.get_model_label(confirmation_label)
             print(confirmation_label)
-            self.annotator.annotate_buffer(confirmation_label)
+            self.annotator.annotate_buffer(confirmation_label, self.true)
         elif affirm_label == 'false':
                 self.story_query_all_labels()
         else:
@@ -103,7 +103,7 @@ class DialogueManager(object):
         self.responder.confirm_label(user_label)
         user_label = self.label_linker.get_model_label(top_label)
         print(user_label)
-        self.annotator.annotate_buffer(user_label)
+        self.annotator.annotate_buffer(user_label, self.true)
 
     def story_query_3_labels(self, reduced):
         self.responder.query_3_labels()
@@ -130,7 +130,7 @@ class DialogueManager(object):
         self.responder.confirm_label(user_label)
         user_label = self.label_linker.get_model_label(top_label)
         print(user_label)
-        self.annotator.annotate_buffer(user_label)
+        self.annotator.annotate_buffer(user_label, self.true)
 
     def story_query_all_labels(self):
         self.responder.query_3_labels()
@@ -157,7 +157,7 @@ class DialogueManager(object):
         self.responder.confirm_label(user_label)
         user_label = self.label_linker.get_model_label(top_label)
         print(user_label)
-        self.annotator.annotate_buffer(user_label)
+        self.annotator.annotate_buffer(user_label, self.true)
 
     # Tools
 

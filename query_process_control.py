@@ -31,7 +31,7 @@ class QueryProcessControl(object):
         self.real_time = False
 
         # set to True for automatic labelling
-        self.oracle = True
+        self.oracle = False
 
         # set to True for automated re-training
         self.auto_al = True
@@ -104,12 +104,12 @@ class QueryProcessControl(object):
                 self.num_queries = self.num_queries + 1
                 self.annotator.lock_buffer()
                 if self.real_time:
-                    threading.Thread(target=lambda: self.dialogue_manager.start_query(votes)).start()
+                    threading.Thread(target=lambda: self.dialogue_manager.start_query(votes, true)).start()
                 else:
                     if self.oracle:
                         self.annotator.annotate_buffer(true)
                     else:   
-                        self.dialogue_manager.start_query(votes)
+                        self.dialogue_manager.start_query(votes, true)
 
             # if query_decision:
             #     self.csv_log(committee_vote_1, committee_vote_2, committee_vote_3, true, disagreement_type, query_decision)

@@ -1,30 +1,30 @@
-other:other:doing something else
-relaxing:relax:relaxing
-working:work:working
-studying:work:working
-sleeping:sleep:sleeping
-leaving_the_house:leave_home:going out
-bathing:bathing:bathing
-cooking:cook:cooking
-eating:eat:eating
-snacking:eat:eating
-watching_TV:relax:relaxing
-using_computer:other:doing something else
-using_smartphone:other:doing something else
-using_internet:other:doing something else
-washing_dishes:work:working
-reading:relax:relaxing
-doing_laundry:work:working
-shaving:personal_hygiene:bathing
-brushing_teeth:personal_hygiene:bathing
-talking_on_phone:relax:relaxing
-listening_to_music:relax:relaxing
-cleaning:work:working
-conversing:relax:relaxing
-hosting_guests:relax:relaxing
-getting_dressed:other:doing something else
-tidying_up:work:working
-exercising:other:doing something else
-hobby:other:doing something else
-taking_medication:other:taking your medication
-toileting:bed_to_toilet:using the toilet
+other:Other:doing something else
+relaxing:Relax:relaxing
+working:Work:working
+studying:Work:working
+sleeping:Sleep:sleeping
+leaving_the_house:Leave_Home:going out
+bathing:Bathing:bathing
+cooking:Cook:cooking
+eating:Eat:eating
+snacking:Eat:eating
+watching_TV:Relax:relaxing
+using_computer:Other:doing something else
+using_smartphone:Other:doing something else
+using_internet:Other:doing something else
+washing_dishes:Work:working
+reading:Relax:relaxing
+doing_laundry:Work:working
+shaving:Personal_hygiene:bathing
+brushing_teeth:Personal_hygiene:bathing
+talking_on_phone:Relax:relaxing
+listening_to_music:Relax:relaxing
+cleaning:Work:working
+conversing:Relax:relaxing
+hosting_guests:Relax:relaxing
+getting_dressed:Other:doing something else
+tidying_up:Work:working
+exercising:Other:doing something else
+hobby:Other:doing something else
+taking_medication:Other:taking your medication
+toileting:Bed_to_toilet:using the toilet

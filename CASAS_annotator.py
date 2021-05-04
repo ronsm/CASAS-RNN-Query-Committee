@@ -21,6 +21,9 @@ class CASASAnnotator(object):
 
         self.buffer_lock = False
 
+        self.num_annotations = 0
+        self.correct_annotations = 0
+
         self.logger.log_great('Ready.')
 
     def create_csv(self, sample):
@@ -54,11 +57,16 @@ class CASASAnnotator(object):
     def unlock_buffer(self):
         self.buffer_lock = False
 
-    def annotate_buffer(self, label):
+    def annotate_buffer(self, label, true):
+        self.num_annotations = self.num_annotations + 1
+        if label == true:
+            self.correct_annotations = self.correct_annotations + 1
+        percent_correct = self.correct_annotations / self.num_annotations
+        print('Percent correct annotations (NLU accuracy): ', percent_correct)
+
         msg = 'Annotating buffer with label: ' + label
         self.logger.log(msg)
 
-        # label = label.lower()
         label = self.committee_predict.get_inverse_label(label)
 
         row = self.hold_sample.tolist()
