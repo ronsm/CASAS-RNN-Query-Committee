@@ -7,6 +7,7 @@ import responder
 from responder import Responder
 from semantic_similarity import SemanticSimilarity
 from semantic_ADLs import SemanticADLs
+from human_response_simulator import HumanResponseSimulator
 
 class LabelEncapsulator(object):
     def __init__(self, model_label, ADL_label, semantic_description):
@@ -34,11 +35,15 @@ class DialogueManager(object):
         self.semantic_ADLs = SemanticADLs()
         self.labels_dict = self.semantic_ADLs.get_semantic_ADLs()
 
+        self.HRS = HumanResponseSimulator()
+
+        self.true = 'null'
+
         self.semantic_similarity = SemanticSimilarity(self.semantic_ADLs)
     
-    def start_query(self, labels):
-        for i in range(0, len(labels)):
-            labels[i] = labels[i].lower()
+    def start_query(self, labels, true):
+        self.true = true
+        print(self.true)
 
         reduced, query_type = self.process_labels(labels)
 
@@ -177,8 +182,22 @@ class DialogueManager(object):
 
         return label_encapsulators, count
 
+    # def get_input_and_respond(self):
+    #     input = self.get_input()
+
+    #     self.aiml.respond(input)
+    #     method = self.aiml.getPredicate('responder')
+        
+    #     if method == 'bypass':
+    #         return
+    #     elif method != '':
+    #         handle = getattr(self.responder, method)
+    #         handle()
+    #     else:
+    #         self.logger.log_warn('No valid response.')
+    
     def get_input_and_respond(self):
-        input = self.get_input()
+        input = self.HRS.get_input(self.true)
 
         self.aiml.respond(input)
         method = self.aiml.getPredicate('responder')
@@ -190,7 +209,7 @@ class DialogueManager(object):
             handle()
         else:
             self.logger.log_warn('No valid response.')
-    
+
     def get_input(self):
         text = input('~>')
         return text
