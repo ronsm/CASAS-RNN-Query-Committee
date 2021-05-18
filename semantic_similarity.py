@@ -80,6 +80,9 @@ class SemanticSimilarity(object):
         if margin < SIMILARITY_MARGIN:
             follow_up = True
 
+        if follow_up:
+            self.logger.log_warn('There will be a follow up question.')
+
         return follow_up, options
 
     def sort_similarity_scores(self, similarity_scores):

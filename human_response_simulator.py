@@ -49,6 +49,8 @@ class HumanResponseSimulator(object):
         self.logger.log_great('Ready.')
 
     def get_input(self, true, follow_up, options):
+        rand = np.random.uniform(low=0.0, high=1.0, size=None)
+
         string = 'I am ' + true
 
         select = -1
@@ -69,5 +71,5 @@ class HumanResponseSimulator(object):
 
         msg = 'HSR: ' + string
         self.logger.log_great(msg)
-        
+
         return string

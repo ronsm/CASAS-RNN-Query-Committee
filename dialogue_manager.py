@@ -81,6 +81,8 @@ class DialogueManager(object):
         else:
             self.logger.log_warn('Invalid affirmation response. AIML error.')
 
+        self.aiml.setPredicate('user_label', '')
+
     def story_query_2_labels(self, reduced):
         self.responder.query_2_labels(reduced)
 
@@ -111,6 +113,7 @@ class DialogueManager(object):
         self.annotator.annotate_buffer(user_label, self.true)
 
         self.follow_up = False
+        self.aiml.setPredicate('user_label', '')
 
     def story_query_3_labels(self, reduced):
         self.responder.query_3_labels()
@@ -142,6 +145,7 @@ class DialogueManager(object):
         self.annotator.annotate_buffer(user_label, self.true)
 
         self.follow_up = False
+        self.aiml.setPredicate('user_label', '')
 
     def story_query_all_labels(self):
         self.responder.query_3_labels()
@@ -173,6 +177,7 @@ class DialogueManager(object):
         self.annotator.annotate_buffer(user_label, self.true)
 
         self.follow_up = False
+        self.aiml.setPredicate('user_label', '')
 
     # Tools
 
