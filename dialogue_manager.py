@@ -35,11 +35,14 @@ class DialogueManager(object):
         self.semantic_ADLs = SemanticADLs()
         self.labels_dict = self.semantic_ADLs.get_semantic_ADLs()
 
-        self.HRS = HumanResponseSimulator()
-
         self.true = 'null'
 
         self.semantic_similarity = SemanticSimilarity(self.semantic_ADLs)
+
+        self.follow_up = False
+        self.options = ['null', 'null']
+
+        self.HRS = HumanResponseSimulator(self.label_linker)
     
     def start_query(self, labels, true):
         self.true = true
@@ -87,6 +90,8 @@ class DialogueManager(object):
             user_label = self.aiml.getPredicate('user_label')
 
         follow_up, options, top_label = self.semantic_similarity.compare_similarity(user_label, labels=reduced)
+        self.follow_up = follow_up
+        self.options = options
 
         self.aiml.setPredicate('user_label', '')
 
@@ -104,6 +109,8 @@ class DialogueManager(object):
         user_label = self.label_linker.get_model_label(top_label)
         print(user_label)
         self.annotator.annotate_buffer(user_label, self.true)
+
+        self.follow_up = False
 
     def story_query_3_labels(self, reduced):
         self.responder.query_3_labels()
@@ -114,6 +121,8 @@ class DialogueManager(object):
             user_label = self.aiml.getPredicate('user_label')
 
         follow_up, options, top_label = self.semantic_similarity.compare_similarity(user_label, labels=reduced)
+        self.follow_up = follow_up
+        self.options = options
 
         self.aiml.setPredicate('user_label', '')
 
@@ -131,6 +140,8 @@ class DialogueManager(object):
         user_label = self.label_linker.get_model_label(top_label)
         print(user_label)
         self.annotator.annotate_buffer(user_label, self.true)
+
+        self.follow_up = False
 
     def story_query_all_labels(self):
         self.responder.query_3_labels()
@@ -141,6 +152,8 @@ class DialogueManager(object):
             user_label = self.aiml.getPredicate('user_label')
 
         follow_up, options, top_label = self.semantic_similarity.compare_similarity(user_label, compare_all=True)
+        self.follow_up = follow_up
+        self.options = options
 
         self.aiml.setPredicate('user_label', '')
 
@@ -158,6 +171,8 @@ class DialogueManager(object):
         user_label = self.label_linker.get_model_label(top_label)
         print(user_label)
         self.annotator.annotate_buffer(user_label, self.true)
+
+        self.follow_up = False
 
     # Tools
 
@@ -197,7 +212,7 @@ class DialogueManager(object):
     #         self.logger.log_warn('No valid response.')
     
     def get_input_and_respond(self):
-        input = self.HRS.get_input(self.true)
+        input = self.HRS.get_input(self.true, self.follow_up, self.options)
 
         self.aiml.respond(input)
         method = self.aiml.getPredicate('responder')

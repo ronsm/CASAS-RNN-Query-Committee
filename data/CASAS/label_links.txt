@@ -6,6 +6,7 @@ sleeping:Sleep:sleeping
 leaving_the_house:Leave_Home:going out
 bathing:Bathing:bathing
 cooking:Cook:cooking
+prepare_drink:Cook:cooking
 eating:Eat:eating
 snacking:Eat:eating
 watching_TV:Relax:relaxing
@@ -13,6 +14,7 @@ using_computer:Other:doing something else
 using_smartphone:Other:doing something else
 using_internet:Other:doing something else
 washing_dishes:Work:working
+showering:Bathing:bathing
 reading:Relax:relaxing
 doing_laundry:Work:working
 shaving:Personal_hygiene:bathing
@@ -23,8 +25,9 @@ cleaning:Work:working
 conversing:Relax:relaxing
 hosting_guests:Relax:relaxing
 getting_dressed:Other:doing something else
-tidying_up:Work:working
-exercising:Other:doing something else
-hobby:Other:doing something else
 taking_medication:Other:taking your medication
+tidying_up:Work:working
 toileting:Bed_to_toilet:using the toilet
+exercising:Other:doing something else
+drinking:Eat:eating
+hobby:Other:doing something else
