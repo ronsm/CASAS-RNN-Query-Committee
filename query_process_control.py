@@ -6,7 +6,7 @@ from time import perf_counter, sleep, strftime
 import csv
 import threading
 import matplotlib.pyplot as plt
-
+import seaborn as sns
 from CASAS_committee_predict import CASASCommitteePredict
 from query_select import QuerySelect
 from dialogue_manager import DialogueManager
@@ -17,6 +17,8 @@ from log import Log
 
 QUERY_LIMIT = 4000
 QUERY_RETRAIN = 25
+
+sns.set_theme()
 
 class QueryProcessControl(object):
     def __init__(self):
@@ -31,7 +33,7 @@ class QueryProcessControl(object):
         self.real_time = False
 
         # set to True for automatic labelling
-        self.oracle = False
+        self.oracle = True
 
         # set to True for automated re-training
         self.auto_al = True
@@ -107,7 +109,7 @@ class QueryProcessControl(object):
                     threading.Thread(target=lambda: self.dialogue_manager.start_query(votes, true)).start()
                 else:
                     if self.oracle:
-                        self.annotator.annotate_buffer(true)
+                        self.annotator.annotate_buffer(true, true)
                     else:   
                         self.dialogue_manager.start_query(votes, true)
 
@@ -223,6 +225,10 @@ class QueryProcessControl(object):
         plt.plot(self.accuracy_query_markers, val_scores_learner_1, marker='', color='blue', linewidth=2, label='Learner 1')
         plt.plot(self.accuracy_query_markers, val_scores_learner_2, marker='', color='red', linewidth=2, label='Learner 2')
         plt.plot(self.accuracy_query_markers, val_scores_learner_3, marker='', color='green', linewidth=2, label='Learner 3')
+
+        plt.title('Learner Accuracy at Training Intervals of 25 Queries')
+        plt.xlabel('No. Labels Gained from Queries')
+        plt.ylabel('Accuracy (%) on Validation Set')
 
         plt.legend()
 

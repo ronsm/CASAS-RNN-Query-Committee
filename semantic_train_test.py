@@ -8,7 +8,7 @@ from semantic_ADLs import SemanticADLs
 
 nlp_eng = spacy.load('en_core_web_lg')
 
-SIMILARITY_MARGIN = 0.1
+SIMILARITY_MARGIN = 0.05
 
 train = {
     'other' : ['doing something else', 'other'],
@@ -142,6 +142,7 @@ count = 0
 top_correct = 0
 top_correct_no_follow_up = 0
 options_correct = 0
+follow_up_no = 0
 for key, value in test.items():
     for item in value:
         similarity_scores = compute_similarity(item)
@@ -155,6 +156,7 @@ for key, value in test.items():
             if key == top_label:
                 top_correct = top_correct + 1
         else:
+            follow_up_no = follow_up_no + 1
             if key == options[0] or key == options[1]:
                 options_correct = options_correct + 1
 
@@ -169,4 +171,4 @@ for key, value in test.items():
         
         count = count + 1
 
-        print('Top Correct (NFU):', (top_correct_no_follow_up/count), 'Top Correct (FU)', (top_correct/count), 'Options Correct:', (options_correct/count), 'Effectivepy Correct:', ((top_correct+options_correct)/count))
+        print('Top Correct (NFU):', (top_correct_no_follow_up/count), 'Top Correct (FU)', (top_correct/count), 'Options Correct:', (options_correct/count), 'Effectivepy Correct:', ((top_correct+options_correct)/count), 'Follow-Up No.:', follow_up_no, 'Count:', count)

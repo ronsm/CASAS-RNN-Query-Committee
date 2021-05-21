@@ -1,6 +1,7 @@
 
 import numpy as np
 from log import Log
+from semantic_ADLs import SemanticADLs
 
 data = {
     'other' : ['other'],
@@ -46,20 +47,39 @@ class HumanResponseSimulator(object):
 
         self.label_linker = label_linker
 
+        self.semantic_ADLs = SemanticADLs()
+
         self.logger.log_great('Ready.')
 
     def get_input(self, true, follow_up, options):
-        rand = np.random.uniform(low=0.0, high=1.0, size=None)
+        descriptor = self.get_ADL_descriptor(true, follow_up, options)
 
-        string = 'I am ' + true
+        response = self.wrap_descriptor(descriptor)
+        
+        self.logger.log_great(response)
 
+        return response
+
+    def get_ADL_descriptor(self, true, follow_up, options):
         select = -1
 
+        descriptor = ''
+
+        ADLs_for_true = self.label_linker.get_ADL_labels(true)
+        selected_ADL = np.random.choice(ADLs_for_true)
+
+        descriptors = data[selected_ADL]
+        descriptor = np.random.choice(descriptors)
+
         if follow_up:
+            ADL_labels = []
             model_options = []
 
-            model_options.append(self.label_linker.get_model_label(options[0]))
-            model_options.append(self.label_linker.get_model_label(options[1]))
+            ADL_labels.append(self.semantic_ADLs.get_ADL_from_descriptor(options[0]))
+            ADL_labels.append(self.semantic_ADLs.get_ADL_from_descriptor(options[1]))
+
+            model_options.append(self.label_linker.get_model_label(ADL_labels[0]))
+            model_options.append(self.label_linker.get_model_label(ADL_labels[1]))
                 
             if model_options[0] == true:
                 select = 0
@@ -67,9 +87,150 @@ class HumanResponseSimulator(object):
                 select = 1
 
             if select != -1:
-                string = 'I am ' + options[select]
+                descriptor = options[select]
 
-        msg = 'HSR: ' + string
-        self.logger.log_great(msg)
+        return descriptor
 
-        return string
+    def wrap_descriptor(self, descriptor):
+        wrappings = []
+
+        wrapping = "I'm " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "I am " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "I'm just " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "I am just " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "Am just " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "No, I am " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "No, I'm " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "Yes, I am " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "Yes, I'm " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "I'm just going to " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "I am just going to " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "I'm just about to " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "I am just about to " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "I was about to " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "I was just about to " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "I'm still " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "I am still " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "I need to " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "I have to " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "I've got to " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "I have got to " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "I got to " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "At the moment I am " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "At the moment I'm " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "You are correct, I am " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "You are correct, I'm " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "That's correct, I'm " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "That's correct, I am " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "That is correct, I'm " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "That is correct, I am " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "That's right, I'm " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "That's right, I am " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "That is right, I'm " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "That is right, I am " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "Now I am " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "Now I'm " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "Yup, still " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "Yeah, still " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "Yes, still " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "Yep, still " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "Yeah, I'm still " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "Yeah, I am still " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "Yes, I am still " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "Yes, I'm still " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "No, I am still " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = "No, I'm still " + descriptor
+        wrappings.append(wrapping)
+
+        wrapping = np.random.choice(wrappings)
+        return wrapping

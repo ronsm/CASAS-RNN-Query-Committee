@@ -16,7 +16,7 @@ data = {
     'snacking' : ['grabbing a snack', 'having a treat', 'having a biscuit', 'having some fruit', 'having some scran', 'having a munch', 'having some chocolate', 'eating some sweeties', 'having a snack attack'],
     'watching_TV' : ['watching TV', 'sitting watching a film', 'sitting watching TV', 'relaxing watching TV', 'watching television', 'watching a programme', 'watching a film', 'watching a movie', 'telly'],
     'using_computer' : ['on the computer', 'sitting on my laptop', 'going to use my laptop', 'spending time on the PC', 'using my PC', 'working on my PC', 'on my computer', 'on my laptop'],
-    'using_smartphone' : ['on the phone', 'mucking about on my phone', 'making a call', 'looking at my phone', 'browsing on my phone', 'browsing Facebook', 'scrolling Twitter', 'scrolling Instagram', 'scrolling Facebook', 'browsing Instagram', 'texting someone', 'texting'],
+    'using_smartphone' : ['using smarthone', 'mucking about on my phone', 'making a call', 'looking at my phone', 'browsing on my phone', 'browsing Facebook', 'scrolling Twitter', 'scrolling Instagram', 'scrolling Facebook', 'browsing Instagram', 'texting someone', 'texting'],
     'using_internet' : ['on the internet', 'shopping online', 'browsing the internet', 'looking something up on the internet', 'browsing the web', 'looking at something on the internet'],
     'washing_dishes' : ['doing dishes', 'washing dishes', 'doing the washing up', 'have to do the dishes', 'washing the dishes', 'washing up'],
     'showering' : ['showering', 'taking a shower', 'getting showered', 'having a shower', 'getting showered'],
@@ -51,3 +51,9 @@ class SemanticADLs(object):
 
     def get_ADL_descriptor(self, key):
         return data[key][0]
+
+    def get_ADL_from_descriptor(self, descriptor):
+        for key, value in data.items():
+            for v in value:
+                if v == descriptor:
+                    return key

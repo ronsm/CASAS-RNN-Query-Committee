@@ -31,3 +31,4 @@ toileting:Bed_to_toilet:using the toilet
 exercising:Other:doing something else
 drinking:Eat:eating
 hobby:Other:doing something else
+other:Enter_home:entering home

@@ -10,3 +10,5 @@ data/CASAS/original/kyoto7
 data/CASAS/original/kyoto8
 data/CASAS/original/kyoto11
 data/CASAS/original/milan
+seaborn_plot.py
+semantic_train_test.py
